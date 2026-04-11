@@ -1,0 +1,34 @@
+{
+  "name": "NEXUS IDE — Stargate Edition",
+  "short_name": "NEXUS IDE",
+  "description": "IDE avanzado para desarrollo PWA con Monaco Editor, IA integrada y herramientas Stargate.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#030d1a",
+  "theme_color": "#00b4ff",
+  "lang": "es",
+  "categories": ["developer", "productivity", "utilities"],
+  "icons": [
+    { "src": "icon.png", "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "icon.png", "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "icon.png", "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "icon.png", "sizes": "144x144", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Editor de Código",
+      "url": "./index.html?panel=editor",
+      "icons": [{ "src": "icon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "AI Chat",
+      "url": "./index.html?panel=chat",
+      "icons": [{ "src": "icon.png", "sizes": "96x96" }]
+    }
+  ],
+  "prefer_related_applications": false
+}
