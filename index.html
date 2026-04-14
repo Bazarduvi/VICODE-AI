@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0d1a"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="CodeAI Hub"/>
+<meta name="description" content="CodeAI Hub Online — Generación de código con IA"/>
+<title>CodeAI Hub Online</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/png" href="icon.png"/>
+<link rel="apple-touch-icon" href="icon.png"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=JetBrains+Mono&family=Exo+2:wght@300;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0d1a;--bg2:#0f1626;--bg3:#141e33;--bgi:#0c1220;
+  --blue:#00c8ff;--bdim:rgba(0,200,255,.15);--bglow:0 0 20px rgba(0,200,255,.5),0 0 60px rgba(0,200,255,.2);
+  --red:#ff3e6c;--rglow:0 0 20px rgba(255,62,108,.6);
+  --yellow:#ffe100;--yglow:0 0 20px rgba(255,225,0,.5);
+  --green:#00ff99;--purple:#c87aff;
+  --t1:#e8f4ff;--t2:#7ba8c4;--t3:#3d5970;
+  --bdr:rgba(0,200,255,.15);--bdr2:rgba(0,200,255,.5);
+  --r:12px;--rl:20px;--tr:0.25s cubic-bezier(.4,0,.2,1);
+  --fd:'Rajdhani',sans-serif;--fb:'Exo 2',sans-serif;--fc:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden;font-size:15px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 10%,rgba(0,200,255,.06) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(200,122,255,.05) 0%,transparent 60%);pointer-events:none;z-index:0}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bdim);border-radius:3px}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:100;background:rgba(10,13,26,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);padding:0 16px;display:flex;align-items:center;gap:10px;height:56px;flex-wrap:wrap;min-height:56px}
+.logo{font-family:var(--fd);font-size:20px;font-weight:700;color:var(--blue);text-shadow:var(--bglow);letter-spacing:1px;white-space:nowrap}
+.logo s{color:var(--red);text-shadow:var(--rglow);text-decoration:none}
+.hsel{background:var(--bgi);border:1px solid var(--bdr);border-radius:8px;color:var(--t1);font-family:var(--fb);font-size:13px;padding:5px 10px;outline:none;cursor:pointer}
+.hsel:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(0,200,255,.1)}
+.hsel option{background:var(--bg2)}
+.lang-wrap{display:flex;gap:5px;align-items:center}
+.lbtn{background:transparent;border:1px solid var(--bdr);border-radius:6px;width:30px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--tr);padding:0}
+.lbtn:hover,.lbtn.on{border-color:var(--blue);background:var(--bdim);box-shadow:0 0 8px rgba(0,200,255,.3)}
+.pom-w{display:flex;align-items:center;gap:6px;background:rgba(20,30,51,.8);border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:4px 10px;margin-left:auto}
+#pom-d{font-family:var(--fd);font-size:18px;font-weight:700;color:var(--red);text-shadow:var(--rglow);letter-spacing:2px;min-width:52px;text-align:center}
+
+/* NAV */
+nav{display:flex;gap:2px;padding:10px 16px 0;background:rgba(10,13,26,.7);border-bottom:1px solid var(--bdr);flex-wrap:wrap;position:relative;z-index:1}
+.tab{background:transparent;border:none;color:var(--t2);font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.5px;padding:8px 13px;cursor:pointer;border-radius:6px 6px 0 0;text-transform:uppercase;position:relative;transition:var(--tr)}
+.tab::after{content:"";position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:0;height:2px;background:var(--blue);box-shadow:0 0 8px var(--blue);transition:width var(--tr)}
+.tab:hover{color:var(--t1);background:var(--bdim)}
+.tab.on{color:var(--blue)}
+.tab.on::after{width:75%}
+
+/* ── Hamburger menu (mobile ≤640px) ─────────────────────── */
+.ham-btn{display:none;background:transparent;border:1px solid var(--bdr);border-radius:7px;width:36px;height:32px;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;flex-shrink:0;transition:var(--tr)}
+.ham-btn:hover{border-color:var(--blue);background:var(--bdim)}
+.ham-btn span{display:block;width:16px;height:2px;background:var(--t2);border-radius:1px;transition:var(--tr)}
+.ham-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg);background:var(--blue)}
+.ham-btn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.ham-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);background:var(--blue)}
+@media(max-width:640px){
+  .ham-btn{display:flex}
+  nav .tab{display:none}
+  nav .tab.on{display:flex}
+  nav.nav-open .tab{display:flex}
+  nav.nav-open{flex-wrap:wrap;padding-bottom:6px}
+  nav .pom-w{margin-left:auto}
+}
+
+/* MAIN */
+main{max-width:1400px;margin:0 auto;padding:20px 16px;position:relative;z-index:1}
+.panel{display:none;animation:fi .3s ease}
+.panel.on{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--rl);padding:20px;position:relative;overflow:hidden;transition:var(--tr)}
+.card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,200,255,.03) 0%,transparent 60%);pointer-events:none}
+.card:hover{border-color:rgba(0,200,255,.3);box-shadow:0 0 28px rgba(0,200,255,.07)}
+.card-r{border-color:rgba(255,62,108,.25)}
+.card-r::before{background:linear-gradient(135deg,rgba(255,62,108,.04) 0%,transparent 60%)}
+.ct{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--blue);margin-bottom:14px;display:flex;align-items:center;gap:7px;letter-spacing:.3px}
+.ct-sm{font-size:13px;color:var(--red)}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:800px){.g2,.g3{grid-template-columns:1fr}.g4{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.g4{grid-template-columns:1fr}}
+
+/* INPUTS */
+input,select,textarea{background:var(--bgi);border:1px solid var(--bdr);border-radius:var(--r);color:var(--t1);font-family:var(--fb);font-size:14px;padding:9px 13px;width:100%;transition:var(--tr);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,200,255,.1)}
+textarea{font-family:var(--fc);font-size:13px;resize:vertical;min-height:110px}
+label{display:block;font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--t2);margin-bottom:5px}
+
+/* BUTTONS */
+.btn{font-family:var(--fd);font-size:14px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:10px 20px;border:none;border-radius:var(--r);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:var(--tr);position:relative;overflow:hidden;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.bp{background:linear-gradient(135deg,#0088cc,#00c8ff);color:#fff;box-shadow:0 4px 18px rgba(0,200,255,.3)}
+.bp:hover{box-shadow:0 6px 28px rgba(0,200,255,.6),var(--bglow);transform:translateY(-1px)}
+.br{background:linear-gradient(135deg,#cc1a40,#ff3e6c);color:#fff;box-shadow:0 4px 18px rgba(255,62,108,.3)}
+.br:hover{box-shadow:0 6px 28px rgba(255,62,108,.6);transform:translateY(-1px)}
+.by{background:linear-gradient(135deg,#cc9900,#ffe100);color:#1a1000;box-shadow:0 4px 18px rgba(255,225,0,.3)}
+.by:hover{box-shadow:var(--yglow);transform:translateY(-1px)}
+.bg{background:transparent;border:1px solid var(--bdr2);color:var(--blue)}
+.bg:hover{background:var(--bdim);box-shadow:var(--bglow)}
+.bsm{padding:7px 13px;font-size:12px}
+.bic{background:transparent;border:1px solid var(--bdr);color:var(--t2);width:30px;height:30px;padding:0;font-size:13px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:var(--tr)}
+.bic:hover{border-color:var(--blue);color:var(--blue);background:var(--bdim)}
+.bic.bd:hover{border-color:var(--red);color:var(--red);background:rgba(255,62,108,.1)}
+.bgrp{display:flex;gap:8px;flex-wrap:wrap}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt20{margin-top:20px}
+.mb16{margin-bottom:16px}
+.fx{display:flex}.fxc{display:flex;align-items:center}.jb{justify-content:space-between}.g8{gap:8px}.g12{gap:12px}
+hr.dv{border:none;border-top:1px solid var(--bdr);margin:18px 0}
+
+/* OUTPUT */
+#output{font-family:var(--fc);font-size:13px;background:var(--bgi);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;min-height:280px;max-height:550px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;line-height:1.7;transition:var(--tr)}
+#output.ld{color:var(--blue);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* STATS */
+.sc{background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);padding:18px;text-align:center}
+.sv{font-family:var(--fd);font-size:32px;font-weight:700;color:var(--blue);text-shadow:var(--bglow);line-height:1;margin-bottom:5px}
+.sl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--t3)}
+
+/* TABLE */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);padding:9px 12px;border-bottom:1px solid var(--bdr);text-align:left;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--t2);vertical-align:middle}
+tr:hover td{background:rgba(0,200,255,.03)}
+.tdp{max-width:260px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tda{display:flex;gap:4px}
+
+/* TAG */
+.tag{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:var(--bdim);color:var(--blue);border:1px solid rgba(0,200,255,.3);display:inline-block}
+
+/* CHARTS */
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.cc{background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);padding:14px}
+.cct{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+
+/* SANDBOX */
+.sb-lay{display:grid;grid-template-columns:1fr 1fr;gap:14px;height:420px}
+@media(max-width:700px){.sb-lay{grid-template-columns:1fr;height:auto}}
+#sb-ed{height:100%;background:#060810;border:1px solid rgba(0,255,153,.2);border-radius:var(--r);color:#00ff99;font-family:var(--fc);font-size:12px;padding:13px;resize:none;outline:none;line-height:1.6;min-height:200px}
+#sb-ed:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(0,255,153,.1)}
+#sb-pre{width:100%;height:100%;border:1px solid var(--bdr);border-radius:var(--r);background:#fff;min-height:200px}
+#sb-fi{display:none;font-size:11px;color:var(--t2);background:var(--bgi);border:1px solid var(--bdr);border-radius:6px;padding:5px 11px;margin-top:7px;align-items:center;justify-content:space-between}
+
+/* TOGGLE */
+.tgl-w{display:flex;align-items:center;gap:10px}
+.tgl{position:relative;width:42px;height:23px;cursor:pointer;flex-shrink:0}
+.tgl input{opacity:0;width:0;height:0}
+.tgl-s{position:absolute;inset:0;background:var(--bgi);border:1px solid var(--bdr);border-radius:11px;transition:var(--tr)}
+.tgl-s::before{content:"";position:absolute;width:15px;height:15px;left:3px;top:3px;background:var(--t3);border-radius:50%;transition:var(--tr)}
+.tgl input:checked+.tgl-s{background:var(--bdim);border-color:var(--blue)}
+.tgl input:checked+.tgl-s::before{transform:translateX(19px);background:var(--blue);box-shadow:0 0 7px var(--blue)}
+
+/* LINK CARD */
+.lc{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);padding:9px 13px;margin-bottom:7px}
+.lc a{color:var(--blue);text-decoration:none;font-size:13px}
+.lc a:hover{text-decoration:underline}
+.lc button{background:transparent;border:none;color:var(--t3);cursor:pointer;font-size:15px;padding:2px 5px;border-radius:4px;transition:var(--tr)}
+.lc button:hover{color:var(--red)}
+
+/* TOAST */
+#tc{position:fixed;bottom:22px;right:16px;z-index:999;display:flex;flex-direction:column;gap:7px;max-width:300px}
+.toast{background:var(--bg3);border:1px solid var(--bdr2);border-radius:var(--r);padding:11px 16px;font-size:13px;color:var(--t1);box-shadow:0 8px 28px rgba(0,0,0,.4),var(--bglow);animation:su .3s ease,fo .3s ease 3.2s forwards}
+.toast.te{border-color:var(--red);box-shadow:0 8px 28px rgba(0,0,0,.4),var(--rglow)}
+.toast.tw2{border-color:var(--yellow)}
+@keyframes su{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes fo{to{opacity:0;transform:translateY(-8px)}}
+
+/* PREMIUM LOCK */
+.locked{position:relative;pointer-events:none;filter:blur(3px) grayscale(.5);user-select:none}
+.locked::after{content:"🔒 Premium";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.85);color:var(--yellow);font-family:var(--fd);font-size:15px;font-weight:700;padding:7px 14px;border-radius:var(--r);pointer-events:all;filter:none;border:1px solid var(--yellow)}
+.pred-c{background:linear-gradient(135deg,rgba(200,122,255,.1),rgba(0,200,255,.05));border:1px solid rgba(200,122,255,.3);border-radius:var(--r);padding:18px}
+.pred-c h4{font-family:var(--fd);color:var(--purple);margin-bottom:10px}
+.pred-c p{color:var(--t2);margin-bottom:5px;font-size:13px}
+
+/* INSTALL PULSE */
+@keyframes ip{0%,100%{box-shadow:0 4px 18px rgba(255,225,0,.3)}50%{box-shadow:0 4px 28px rgba(255,225,0,.7),var(--yglow)}}
+.ip{animation:ip 2s ease-in-out infinite}
+
+/* LANG BTN LG */
+.lbl{background:var(--bg3);border:1px solid var(--bdr);border-radius:7px;padding:7px 13px;font-family:var(--fb);font-size:12px;color:var(--t2);cursor:pointer;transition:var(--tr)}
+.lbl:hover,.lbl.on{border-color:var(--blue);color:var(--blue);background:var(--bdim)}
+
+/* ─── Accordion (manual) ─────────────────────────────── */
+.ms{background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);overflow:hidden;margin-bottom:8px}
+.mh{padding:12px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--t1);transition:var(--tr);user-select:none;gap:8px}
+.mh:hover{background:rgba(0,212,255,.04)}
+.mh .arr{flex-shrink:0;font-size:10px;color:var(--t2);transition:transform .2s ease}
+.mh.op .arr{transform:rotate(90deg)}
+.mb{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .38s ease,padding .38s ease}
+.mb.op{max-height:2000px;padding:12px 16px}
+.mb p,.mb li{font-size:12px;color:var(--t2);line-height:1.8;margin-bottom:3px}
+.mb h4{font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--blue);margin:10px 0 5px}
+.mb ul,.mb ol{padding-left:18px}
+.mb code{background:var(--bgi);border:1px solid var(--bdr);border-radius:3px;padding:1px 5px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--green)}
+.mb kbd{background:var(--bg3);border:1px solid var(--bdr2);border-radius:3px;padding:1px 6px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--blue)}
+.mb a{color:var(--blue);text-decoration:none}
+.mb a:hover{text-decoration:underline}
+/* ─── Policy cards ───────────────────────────────────── */
+.pc{background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.pc h3{font-family:'Rajdhani',sans-serif;font-size:15px;color:var(--blue);margin-bottom:10px}
+.pc h4{font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--blue);margin:10px 0 5px}
+.pc p,.pc li{font-size:12px;color:var(--t2);line-height:1.8;margin-bottom:4px}
+.pc ul{padding-left:18px}
+.pc .hl{background:rgba(0,212,255,.06);border-left:3px solid var(--blue);padding:8px 12px;border-radius:0 6px 6px 0;margin:8px 0;font-size:12px;color:var(--t1)}
+.pc .rok{color:var(--green)}.pc .rwarn{color:var(--yellow)}.pc .rbad{color:var(--red)}
+/* ─── Premium import file label ──────────────────────── */
+.prem-file-label{display:inline-flex;align-items:center;gap:6px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;padding:8px 16px;border:1px solid rgba(255,215,0,.4);border-radius:var(--r);cursor:pointer;color:var(--yellow);background:transparent;transition:var(--tr)}
+.prem-file-label:hover{background:rgba(255,215,0,.08);border-color:var(--yellow)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" style="display:flex;align-items:center;gap:8px">Code<s>AI</s> Hub <span style="font-size:9px;color:var(--t3);font-family:sans-serif;font-weight:400">v2</span><span id="hdr-count" style="font-size:10px;font-family:sans-serif;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.3);border-radius:10px;padding:1px 7px;color:var(--blue);font-weight:600;margin-left:2px">0</span></div>
+  <div class="fxc g8">
+    <label for="msel" style="margin:0;white-space:nowrap;font-size:12px" id="lbl-model">Modelo:</label>
+    <select id="msel" class="hsel" style="width:auto"></select>
+  </div>
+  <div class="lang-wrap">
+    <button class="lbtn on" data-lang="es" title="Español">🇪🇸</button>
+    <button class="lbtn" data-lang="en" title="English">🇬🇧</button>
+    <button class="lbtn" data-lang="zh" title="中文">🇨🇳</button>
+  </div>
+  <button id="btn-install" class="btn by bsm" style="display:none" id="btn-install">📲 Instalar</button>
+
+</header>
+
+<nav id="main-nav">
+  <button class="ham-btn" id="ham-btn" onclick="toggleNav()" aria-label="Menú" title="Menú"><span></span><span></span><span></span></button>
+  <button class="tab on" data-tab="gen" id="tab-gen">⚡ Generador</button>
+  <button class="tab" data-tab="dash" id="tab-dash">📊 Dashboard</button>
+  <button class="tab" data-tab="sb" id="tab-sb">🧪 Sandbox</button>
+  <button class="tab" data-tab="cfg" id="tab-cfg">⚙️ Config</button>
+  <button class="tab" data-tab="doc" id="tab-doc">📚 Docs</button>
+  <div class="pom-w" style="margin-left:auto;padding:4px 8px">
+    <span style="font-size:12px">🍅</span>
+    <span id="pom-d">25:00</span>
+    <button class="btn bg bsm" id="btn-pom" style="padding:3px 7px;min-width:26px;font-size:11px">▶</button>
+    <button class="btn bg bsm" id="btn-pom-r" style="padding:3px 7px;min-width:26px;font-size:11px">↺</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- GENERADOR -->
+<div class="panel on" id="panel-gen">
+  <div class="g2">
+    <div>
+      <div class="card">
+        <div class="ct" id="ct-gen">⚡ Generador de Código IA</div>
+        <label id="lbl-gen">Describe lo que quieres generar</label>
+        <textarea id="prompt" rows="5" id="prompt-input"></textarea>
+        <div class="bgrp mt16">
+          <button class="btn bp" id="btn-gen">🤖 Generar con IA</button>
+          <button class="btn bg" id="btn-net">🌐 Obtener datos</button>
+          <button class="btn bg bsm" id="btn-url">🔗 URL</button>
+        </div>
+      </div>
+      <div class="card card-r mt16">
+        <div class="ct ct-sm" id="ct-qp">⚡ Prompts Rápidos</div>
+        <div class="bgrp">
+          <button class="btn bg bsm" onclick="setQP('pwa')">PWA</button>
+          <button class="btn bg bsm" onclick="setQP('react')">React</button>
+          <button class="btn bg bsm" onclick="setQP('html')">HTML</button>
+          <button class="btn bg bsm" onclick="setQP('apk')">APK</button>
+          <button class="btn bg bsm" onclick="setQP('agent')">IA Agent</button>
+          <button class="btn bg bsm" onclick="setQP('api')">API REST</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="height:100%">
+        <div class="ct fxc jb">
+          <span id="ct-out">📄 Resultado</span>
+          <div class="bgrp">
+            <button class="bic" id="btn-copy-out" title="Copiar">📋</button>
+            <button class="bic" id="btn-save-out" title="Guardar">💾</button>
+          </div>
+        </div>
+        <pre id="output">// El código generado aparecerá aquí...
+//
+// Configura tu API key en ⚙️ Config
+// y empieza a generar.</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="panel" id="panel-dash">
+
+  <!-- ── AI Training hero ──────────────────────────────── -->
+  <div class="train-hero">
+    <h2>🧠 Entrenar IA con tus Datos</h2>
+    <p>Usa tus snippets, URLs y dataset para mejorar las respuestas de la IA. Guarda los datos de entrenamiento localmente y sincroniza con Drive cuando esté disponible.</p>
+    <div style="margin-bottom:16px">
+      <span class="train-status offline" id="train-api-status">⚪ API IA no conectada</span>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button class="btn bp" id="btn-train-ai" style="font-size:16px;padding:14px 32px;border-radius:12px;box-shadow:0 6px 28px rgba(0,212,255,.4)">
+        🧠 Entrenar IA con mis snippets
+      </button>
+      <button class="btn bg" id="btn-connect-train-api" style="font-size:13px;padding:10px 20px"
+        onclick="toggleTrainApiForm()">
+        🔌 Conectar API de entrenamiento
+      </button>
+    </div>
+    <div id="train-progress" style="display:none;margin-top:14px">
+      <div style="background:var(--bg3);border-radius:20px;height:8px;overflow:hidden;max-width:400px;margin:0 auto 8px">
+        <div id="train-bar" style="height:100%;background:linear-gradient(90deg,var(--blue),var(--purple));border-radius:20px;width:0%;transition:width .4s ease"></div>
+      </div>
+      <div id="train-msg" style="font-size:12px;color:var(--t2)">Preparando datos...</div>
+    </div>
+    <!-- Inline API form — no window.prompt -->
+    <div id="train-api-form" style="display:none;background:rgba(0,0,0,.3);border:1px solid var(--bdr);border-radius:var(--r);padding:14px;margin-top:12px;max-width:480px;margin-left:auto;margin-right:auto;text-align:left">
+      <div style="font-size:13px;color:var(--t1);font-weight:600;margin-bottom:10px">🔌 Configurar API de entrenamiento</div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--t2);margin-bottom:4px;display:block">URL del servidor</label>
+        <input type="text" id="train-api-url-input" placeholder="http://localhost:5000/train  o  https://api.openllm.ai/v1/train"
+          style="font-size:12px;background:var(--bgi);border:1px solid var(--bdr);border-radius:var(--r);color:var(--t1);padding:8px 12px;width:100%;outline:none"/>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">
+          Servidores compatibles: <strong style="color:var(--blue)">Ollama</strong> · OpenLLM · LM Studio · cualquier API REST
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--t2);margin-bottom:4px;display:block">Token (opcional)</label>
+        <input type="password" id="train-api-token-input" placeholder="Bearer token si lo requiere..."
+          style="font-size:12px;background:var(--bgi);border:1px solid var(--bdr);border-radius:var(--r);color:var(--t1);padding:8px 12px;width:100%;outline:none"/>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn bp bsm" onclick="saveTrainApiConfig()">💾 Guardar y conectar</button>
+        <button class="btn bg bsm" onclick="toggleTrainApiForm()">✕ Cancelar</button>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--t3);margin-top:12px">
+      💡 Los datos se guardan en localStorage. Se sincronizan con Drive automáticamente cuando hay conexión.
+    </p>
+  </div>
+
+  <div class="g4 mb16">
+    <div class="sc"><div class="sv" id="st-tot">0</div><div class="sl" id="sl-tot">Snippets totales</div></div>
+    <div class="sc"><div class="sv" id="st-sz" style="color:var(--green);text-shadow:0 0 18px rgba(0,255,153,.5)">0 KB</div><div class="sl" id="sl-sz">Datos guardados</div></div>
+    <div class="sc"><div class="sv" id="st-hoy" style="color:var(--yellow);text-shadow:var(--yglow)">0</div><div class="sl" id="sl-hoy">Hoy generados</div></div>
+    <div class="sc"><div class="sv" id="st-mod" style="font-size:13px;padding-top:6px">—</div><div class="sl" id="sl-mod">Modelos usados</div></div>
+  </div>
+  <div class="cg mb16">
+    <div class="cc"><div class="cct" id="ct-cbar">📊 Tamaño por snippet</div><canvas id="chart-bar" height="200"></canvas></div>
+    <div class="cc"><div class="cct" id="ct-cpie">🥧 Distribución por tipo</div><canvas id="chart-pie" height="200"></canvas></div>
+    <div class="cc"><div class="cct" id="ct-clin">📈 Crecimiento acumulado</div><canvas id="chart-line" height="200"></canvas></div>
+  </div>
+  <div id="pred-sec" style="display:none" class="mb16"></div>
+  <div class="card">
+    <div class="ct fxc jb">
+      <span id="ct-hist">🗂️ Historial</span>
+      <div class="bgrp">
+        <button class="btn bg bsm" id="btn-exp" >⬇️ Exportar JSON</button>
+        <label class="btn bg bsm" style="cursor:pointer;margin:0">
+          <span id="lbl-imp">⬆️ Importar</span>
+          <input type="file" id="inp-imp" accept=".json" style="display:none"/>
+        </label>
+      </div>
+    </div>
+    <div style="margin:10px 0 8px">
+      <input type="text" id="search-snips" placeholder="🔍 Buscar en historial..." oninput="filterTable(this.value)" style="font-size:12px;padding:7px 12px"/>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr>
+          <th id="th-p">Prompt</th><th id="th-t">Tipo</th>
+          <th id="th-m">Modelo</th><th id="th-s">Tamaño</th>
+          <th id="th-d">Fecha</th><th id="th-a">Acciones</th>
+        </tr></thead>
+        <tbody id="tbl-body"><tr><td colspan="6" style="text-align:center;color:var(--t3);padding:36px" id="tbl-empty">Sin snippets aún.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SANDBOX -->
+<div class="panel" id="panel-sb">
+  <div class="card">
+    <div class="ct fxc jb" style="flex-wrap:wrap;gap:8px">
+      <span id="ct-sb">🧪 Sandbox Editor</span>
+      <div class="bgrp" style="flex-wrap:wrap">
+        <button class="btn bg bsm" id="sb-all" >☰ Todo</button>
+        <button class="btn bg bsm" id="sb-cp">📋 Copiar</button>
+        <button class="btn bp bsm" id="sb-sv">💾 Guardar</button>
+        <button class="btn by bsm" id="sb-run">▶ Ejecutar</button>
+        <label class="btn bg bsm" style="cursor:pointer;margin:0">
+          <span id="lbl-upl">📂 Subir archivo</span>
+          <input type="file" id="sb-file" accept=".html,.js,.css,.txt,.json,.md,.jsx,.ts,.tsx,.py,.php,.xml,.svg" style="display:none"/>
+        </label>
+        <button class="btn bg bsm" id="sb-clr" style="color:var(--red)">🗑️ Limpiar</button>
+      </div>
+    </div>
+    <div id="sb-fi" style="display:none;font-size:11px;color:var(--t2);background:var(--bgi);border:1px solid var(--bdr);border-radius:6px;padding:5px 11px;margin-top:7px;flex-direction:row;align-items:center;justify-content:space-between">
+      <span>📄 <span id="sb-fn">—</span></span>
+      <span id="sb-fs" style="color:var(--blue)">—</span>
+    </div>
+    <div class="sb-lay mt12">
+      <textarea id="sb-ed" spellcheck="false" placeholder="// Pega código HTML/JS/CSS aquí o usa 📂 Subir archivo
+// Clic en ▶ Ejecutar para ver preview en vivo.
+
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;body style=&quot;background:#0a0d1a;color:#00c8ff;font-family:sans-serif;padding:20px&quot;&gt;
+  &lt;h1&gt;CodeAI Sandbox 🚀&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;"></textarea>
+      <div style="display:flex;flex-direction:column;gap:7px;height:100%">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--t3)" id="lbl-prev">Vista previa</div>
+        <iframe id="sb-pre" title="Preview" sandbox="allow-scripts allow-same-origin allow-forms" style="flex:1;border:1px solid var(--bdr);border-radius:var(--r);background:#fff;min-height:200px"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIG -->
+<div class="panel" id="panel-cfg">
+
+  <!-- ── ROW 1: API Keys + Appearance ──────────────────── -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
+
+    <div class="card">
+      <div class="ct" id="ct-keys">🔑 Claves API</div>
+      <div style="margin-bottom:14px">
+        <label id="lbl-gk">Groq API Key (gratuita)</label>
+        <input type="password" id="key-groq" placeholder="gsk_..." autocomplete="off" style="margin-top:5px"/>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px">Gratis en <a href="https://console.groq.com" target="_blank" style="color:var(--blue)">console.groq.com</a></div>
+      </div>
+      <div style="margin-bottom:14px">
+        <label id="lbl-gem">Gemini API Key (gratuita)</label>
+        <input type="password" id="key-gem" placeholder="AIza..." autocomplete="off" style="margin-top:5px"/>
+        <div style="font-size:11px;color:var(--t3);margin-top:4px">Gratis en <a href="https://aistudio.google.com" target="_blank" style="color:var(--blue)">aistudio.google.com</a></div>
+      </div>
+      <button class="btn bp" id="btn-savekeys" style="width:100%">💾 Guardar claves</button>
+    </div>
+
+    <div class="card">
+      <div class="ct" id="ct-app">🎨 Apariencia</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+        <div>
+          <div style="font-size:13px;color:var(--t1);font-weight:600" id="lbl-dm">Modo oscuro</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:2px">Tema visual</div>
+        </div>
+        <label class="tgl"><input type="checkbox" id="tgl-dark" checked/><span class="tgl-s"></span></label>
+      </div>
+      <div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">
+        <label id="lbl-lang" style="margin-bottom:8px">Idioma / Language / 语言</label>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="lbl on" data-ls="es">🇪🇸 ES</button>
+          <button class="lbl" data-ls="en">🇬🇧 EN</button>
+          <button class="lbl" data-ls="zh">🇨🇳 ZH</button>
+        </div>
+      </div>
+      <div style="padding-top:10px">
+        <label style="margin-bottom:8px">📐 Vista de pantalla</label>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="vp-btn vp-on" data-vp="auto" onclick="setViewport('auto',this)">🖥️ Auto</button>
+          <button class="vp-btn" data-vp="desktop" onclick="setViewport('desktop',this)">💻 Escritorio</button>
+          <button class="vp-btn" data-vp="tablet" onclick="setViewport('tablet',this)">📱 Tablet</button>
+          <button class="vp-btn" data-vp="mobile" onclick="setViewport('mobile',this)">📲 Móvil</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ROW 2: Google Drive REAL ────────────────────────── -->
+  <div style="margin-bottom:16px">
+    <div class="card">
+      <div class="ct">☁️ Google Drive — Conexión Real</div>
+      <p style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.6">
+        Conecta tu Google Drive directamente. Necesitas un <strong>Client ID</strong> de Google Cloud Console y un <strong>Access Token</strong> OAuth2.
+        <a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue)">Obtener aquí →</a>
+      </p>
+      <div class="drive-form-row">
+        <div>
+          <label>Google Client ID</label>
+          <input type="text" id="drv-client-id" placeholder="xxxx.apps.googleusercontent.com" autocomplete="off" style="margin-top:4px"/>
+        </div>
+        <div>
+          <label>Access Token OAuth2</label>
+          <input type="password" id="drv-token" placeholder="ya29.xxx..." autocomplete="off" style="margin-top:4px"/>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--t3);margin-bottom:12px">
+        ⚠️ El token caduca cada hora. Renuévalo en Google OAuth Playground:
+        <a href="https://developers.google.com/oauthplayground" target="_blank" style="color:var(--blue)">OAuth Playground</a>
+        — scope: <code style="background:var(--bgi);padding:1px 4px;border-radius:3px;font-size:10px">https://www.googleapis.com/auth/drive.file</code>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn bp bsm" id="btn-drv-save">💾 Guardar conexión</button>
+        <button class="btn bg bsm" id="btn-drv-con">🔗 Probar conexión</button>
+        <button class="btn bg bsm" id="btn-drv-sync">🔄 Sincronizar ahora</button>
+        <button class="btn bg bsm" id="btn-drv-sync-train">🧠 Sync datos IA</button>
+        <span id="drv-status" style="font-size:11px;color:var(--t3)">No conectado</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ROW 3: Links IA + Docs ───────────────────────────── -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="ct">🔗 URLs para alimentar la IA</div>
+      <p style="font-size:12px;color:var(--t3);margin-bottom:10px;line-height:1.6">
+        Añade URLs de documentación, APIs o recursos. La IA las usará como contexto al generar código.
+      </p>
+      <div id="lnk-list" style="max-height:200px;overflow-y:auto"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+        <button class="btn bp bsm" id="btn-addlnk">+ Añadir URL</button>
+        <button class="btn bg bsm" id="btn-fetch-links">🤖 Cargar en IA</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct">📦 Exportar / Importar Perfil</div>
+      <p style="font-size:12px;color:var(--t3);margin-bottom:12px;line-height:1.6">
+        Guarda toda tu configuración, snippets, URLs y datos de entrenamiento en un archivo JSON para trasladarlos a otro dispositivo.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn bp bsm" id="btn-export-profile">⬇️ Exportar perfil</button>
+        <label class="btn bg bsm" style="cursor:pointer;margin:0">
+          ⬆️ Importar perfil
+          <input type="file" id="inp-import-profile" accept=".json" style="display:none"/>
+        </label>
+      </div>
+      <div style="font-size:11px;color:var(--t3);margin-top:10px">
+        Incluye: snippets, claves (cifradas), URLs IA, ajustes y datos de entrenamiento.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ROW 4: Premium ───────────────────────────────────── -->
+  <div class="card" style="border-color:rgba(255,215,0,.25);background:linear-gradient(135deg,rgba(255,215,0,.04),var(--bg2) 60%)">
+    <div class="ct" style="color:var(--yellow)" id="ct-prem">⭐ Activar Premium</div>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6" id="txt-prem">
+      Desbloquea: auto-sync Google Drive, gráficos IA, predicciones del dashboard y exportación completa.<br>
+      Verificación local por SHA-256 — sin conexión al servidor.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:14px">
+      <div>
+        <label style="margin-bottom:5px">Contraseña de activación</label>
+        <input type="password" id="prem-pwd" placeholder="Introduce la contraseña..." autocomplete="off" style="margin-top:4px"/>
+        <div style="font-size:10px;color:var(--t3);margin-top:3px">Verificado por SHA-256 en local</div>
+      </div>
+      <div>
+        <label style="margin-bottom:5px">O clave JSON</label>
+        <textarea id="prem-key" rows="2" placeholder='{"key":"CONTRASEÑA","plan":"premium"}' style="font-size:11px;min-height:44px;resize:none;margin-top:4px"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="btn by" id="btn-prem">🔓 Activar Premium</button>
+      <label class="prem-file-label" title="Importar archivo .json con la clave">
+        📂 Importar clave .json
+        <input type="file" id="prem-file-input" accept=".json,.txt" style="display:none"/>
+      </label>
+    </div>
+    <div id="prem-status" style="display:none;margin-top:12px;font-size:13px;color:var(--green);font-family:Rajdhani,sans-serif;font-weight:700">✅ Premium activo — funciones desbloqueadas</div>
+  </div>
+
+</div>
+<!-- DOCS -->
+<div class="panel" id="panel-doc">
+
+  <!-- Manual header + expand controls -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="ct">📖 Manual de Uso — CodeAI Hub Online v2</div>
+    <p style="font-size:12px;color:var(--t2);margin-bottom:12px">Guía completa e interactiva. Toca cada sección para expandirla o abre el manual completo en ventana emergente.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn bp bsm" onclick="openManualModal()">📖 Abrir Manual completo</button>
+      <button class="btn bg bsm" onclick="expandAll()">⬆️ Expandir todo</button>
+      <button class="btn bg bsm" onclick="collapseAll()">⬇️ Colapsar todo</button>
+    </div>
+  </div>
+
+  <!-- Manual sections (accordion) -->
+  <div id="manualContent"></div>
+
+  <!-- API Resources -->
+  <div class="card" style="margin-top:14px">
+    <div class="ct">🚀 APIs y Recursos Gratuitos</div>
+    <div class="g3" style="margin-top:10px">
+      <div class="lc"><a href="https://console.groq.com" target="_blank">🟣 Groq Console</a></div>
+      <div class="lc"><a href="https://aistudio.google.com" target="_blank">🔵 Google AI Studio</a></div>
+      <div class="lc"><a href="https://developer.mozilla.org" target="_blank">🟠 MDN Web Docs</a></div>
+      <div class="lc"><a href="https://github.com" target="_blank">⚫ GitHub</a></div>
+      <div class="lc"><a href="https://www.pwabuilder.com" target="_blank">🏗️ PWABuilder</a></div>
+      <div class="lc"><a href="https://web.dev" target="_blank">🟢 web.dev</a></div>
+    </div>
+  </div>
+
+  <!-- Policies -->
+  <div id="polContent" style="margin-top:14px"></div>
+
+</div>
+
+
+<!-- ══ MANUAL POPUP MODAL ══════════════════════════════ -->
+<div class="modal-overlay" id="manualModal" onclick="if(event.target===this)closeManualModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2>📖 Manual Completo — CodeAI Hub Online v2</h2>
+      <button class="modal-close" onclick="closeManualModal()">✕</button>
+    </div>
+    <div class="modal-body" id="manualModalBody"></div>
+  </div>
+</div>
+
+</main>
+
+<div id="tc"></div>
+
+<script>
+// ─── i18n ────────────────────────────────────────────────────────
+const T = {
+  es:{model:"Modelo",gen_lbl:"Describe lo que quieres generar",gen_ph:"Ej: Crea una PWA con service worker y manifest.json que funcione offline con IndexedDB...",btn_gen:"🤖 Generar con IA",btn_net:"🌐 Obtener datos de Internet",btn_url:"🔗 URL",ct_qp:"⚡ Prompts Rápidos",ct_out:"📄 Resultado",st_tot:"Snippets totales",st_sz:"Datos guardados",st_hoy:"Hoy generados",st_mod:"Modelos usados",ct_sb:"🧪 Sandbox Editor",lbl_prev:"Vista previa",lbl_upl:"📂 Subir archivo",ct_keys:"🔑 Claves API",lbl_gk:"Groq API Key (gratuita)",hint_gk:"Obtén gratis en",lbl_gem:"Gemini API Key (gratuita)",hint_gem:"Obtén gratis en",btn_savekeys:"💾 Guardar claves",ct_app:"🎨 Apariencia",lbl_dm:"Modo oscuro",lbl_lang:"Idioma / Language / 语言",ct_drv:"☁️ Google Drive Sync",txt_drv:"Sincroniza snippets con Google Drive. Requiere OAuth token.",btn_drv_con:"🔗 Conectar Drive",btn_drv_sync:"🔄 Sincronizar",ct_lnks:"🔗 Documentación personalizada",ct_prem:"⭐ Activar Premium",txt_prem:"Desbloquea exportación a Drive, predicciones avanzadas y sandbox ilimitado.",btn_prem:"🔓 Activar con clave",btn_install:"📲 Instalar App",th_p:"Prompt",th_t:"Tipo",th_m:"Modelo",th_s:"Tamaño",th_d:"Fecha",th_a:"Acciones",tbl_empty:"Sin snippets aún. ¡Genera tu primer código!",btn_exp:"⬇️ Exportar JSON",lbl_imp:"⬆️ Importar",ct_hist:"🗂️ Historial",tab_gen:"⚡ Generador",tab_dash:"📊 Dashboard",tab_sb:"🧪 Sandbox",tab_cfg:"⚙️ Config",tab_doc:"📚 Docs",ct_gen:"⚡ Generador de Código IA",sb_all:"☰ Todo",sb_cp:"📋 Copiar",sb_sv:"💾 Guardar",sb_run:"▶ Ejecutar",sb_clr:"🗑️ Limpiar",toast_keys:"🔑 Claves guardadas",toast_copy:"📋 Copiado",toast_save:"💾 Guardado",toast_del:"🗑️ Eliminado",toast_drv_ok:"☁️ Drive conectado",toast_sync:"☁️ Sincronizado",toast_lnk:"🔗 Enlace añadido",toast_prem_ok:"⭐ Premium activado",toast_prem_no:"❌ Clave inválida",toast_no_prompt:"⚠️ Escribe un prompt primero",toast_no_drv:"Conecta Google Drive primero",toast_ready:"🚀 CodeAI Hub Online listo",toast_pom:"🍅 ¡Pomodoro completado! Descansa 5 min.",toast_url_ok:"✅ Contenido guardado",ct_cbar:"📊 Tamaño por snippet",ct_cpie:"🥧 Distribución por tipo",ct_clin:"📈 Crecimiento acumulado"},
+  en:{model:"Model",gen_lbl:"Describe what you want to generate",gen_ph:"E.g.: Create a PWA with service worker and manifest.json that works offline with IndexedDB...",btn_gen:"🤖 Generate with AI",btn_net:"🌐 Fetch from Internet",btn_url:"🔗 URL",ct_qp:"⚡ Quick Prompts",ct_out:"📄 Output",st_tot:"Total snippets",st_sz:"Data saved",st_hoy:"Generated today",st_mod:"Models used",ct_sb:"🧪 Sandbox Editor",lbl_prev:"Preview",lbl_upl:"📂 Upload file",ct_keys:"🔑 API Keys",lbl_gk:"Groq API Key (free)",hint_gk:"Get free at",lbl_gem:"Gemini API Key (free)",hint_gem:"Get free at",btn_savekeys:"💾 Save keys",ct_app:"🎨 Appearance",lbl_dm:"Dark mode",lbl_lang:"Language / Idioma / 语言",ct_drv:"☁️ Google Drive Sync",txt_drv:"Sync snippets with Google Drive. Requires OAuth token.",btn_drv_con:"🔗 Connect Drive",btn_drv_sync:"🔄 Sync now",ct_lnks:"🔗 Custom Documentation",ct_prem:"⭐ Activate Premium",txt_prem:"Unlock Drive export, advanced predictions and unlimited sandbox.",btn_prem:"🔓 Activate with key",btn_install:"📲 Install App",th_p:"Prompt",th_t:"Type",th_m:"Model",th_s:"Size",th_d:"Date",th_a:"Actions",tbl_empty:"No snippets yet. Generate your first code!",btn_exp:"⬇️ Export JSON",lbl_imp:"⬆️ Import",ct_hist:"🗂️ History",tab_gen:"⚡ Generator",tab_dash:"📊 Dashboard",tab_sb:"🧪 Sandbox",tab_cfg:"⚙️ Settings",tab_doc:"📚 Docs",ct_gen:"⚡ AI Code Generator",sb_all:"☰ All",sb_cp:"📋 Copy",sb_sv:"💾 Save",sb_run:"▶ Run",sb_clr:"🗑️ Clear",toast_keys:"🔑 Keys saved",toast_copy:"📋 Copied",toast_save:"💾 Saved",toast_del:"🗑️ Deleted",toast_drv_ok:"☁️ Drive connected",toast_sync:"☁️ Synced with Drive",toast_lnk:"🔗 Link added",toast_prem_ok:"⭐ Premium activated",toast_prem_no:"❌ Invalid key",toast_no_prompt:"⚠️ Enter a prompt first",toast_no_drv:"Connect Google Drive first",toast_ready:"🚀 CodeAI Hub Online ready",toast_pom:"🍅 Pomodoro done! Take a 5-min break.",toast_url_ok:"✅ Content saved",ct_cbar:"📊 Size per snippet",ct_cpie:"🥧 Distribution by type",ct_clin:"📈 Cumulative growth"},
+  zh:{model:"模型",gen_lbl:"描述你想生成的内容",gen_ph:"例如：创建一个带有 Service Worker 和 manifest.json 的 PWA，支持 IndexedDB 离线工作...",btn_gen:"🤖 用 AI 生成",btn_net:"🌐 从网络获取数据",btn_url:"🔗 网址",ct_qp:"⚡ 快速提示",ct_out:"📄 输出结果",st_tot:"代码片段总数",st_sz:"已保存数据",st_hoy:"今日生成",st_mod:"使用的模型",ct_sb:"🧪 沙盒编辑器",lbl_prev:"预览",lbl_upl:"📂 上传文件",ct_keys:"🔑 API 密钥",lbl_gk:"Groq API 密钥（免费）",hint_gk:"免费获取：",lbl_gem:"Gemini API 密钥（免费）",hint_gem:"免费获取：",btn_savekeys:"💾 保存密钥",ct_app:"🎨 外观",lbl_dm:"深色模式",lbl_lang:"语言 / Language / Idioma",ct_drv:"☁️ Google Drive 同步",txt_drv:"自动将代码片段同步到 Google Drive。",btn_drv_con:"🔗 连接 Drive",btn_drv_sync:"🔄 立即同步",ct_lnks:"🔗 自定义文档",ct_prem:"⭐ 激活高级版",txt_prem:"解锁 Drive 导出、高级预测等功能。",btn_prem:"🔓 用密钥激活",btn_install:"📲 安装应用",th_p:"提示词",th_t:"类型",th_m:"模型",th_s:"大小",th_d:"日期",th_a:"操作",tbl_empty:"暂无代码片段。生成你的第一个代码！",btn_exp:"⬇️ 导出 JSON",lbl_imp:"⬆️ 导入",ct_hist:"🗂️ 历史记录",tab_gen:"⚡ 代码生成",tab_dash:"📊 仪表盘",tab_sb:"🧪 沙盒",tab_cfg:"⚙️ 设置",tab_doc:"📚 文档",ct_gen:"⚡ AI 代码生成器",sb_all:"☰ 全选",sb_cp:"📋 复制",sb_sv:"💾 保存",sb_run:"▶ 运行",sb_clr:"🗑️ 清除",toast_keys:"🔑 密钥已保存",toast_copy:"📋 已复制",toast_save:"💾 已保存",toast_del:"🗑️ 已删除",toast_drv_ok:"☁️ Drive 已连接",toast_sync:"☁️ 已同步到 Drive",toast_lnk:"🔗 链接已添加",toast_prem_ok:"⭐ 高级版已激活",toast_prem_no:"❌ 无效密钥",toast_no_prompt:"⚠️ 请输入提示词",toast_no_drv:"请先连接 Google Drive",toast_ready:"🚀 CodeAI Hub Online 已就绪",toast_pom:"🍅 番茄钟完成！休息 5 分钟。",toast_url_ok:"✅ 内容已保存",ct_cbar:"📊 片段大小",ct_cpie:"🥧 类型分布",ct_clin:"📈 累计增长"}
+};
+let lang = localStorage.getItem("lang") || "es";
+function t(k){ return T[lang]?.[k] || T.es[k] || k; }
+function applyLang(){
+  document.documentElement.lang = lang;
+  const m={
+    "lbl-model":t("model"),"ct-gen":t("ct_gen"),"lbl-gen":t("gen_lbl"),
+    "btn-gen":t("btn_gen"),"btn-net":t("btn_net"),"btn-url":t("btn_url"),
+    "ct-qp":t("ct_qp"),"ct-out":t("ct_out"),
+    "sl-tot":t("st_tot"),"sl-sz":t("st_sz"),"sl-hoy":t("st_hoy"),"sl-mod":t("st_mod"),
+    "ct-cbar":t("ct_cbar"),"ct-cpie":t("ct_cpie"),"ct-clin":t("ct_clin"),
+    "ct-hist":t("ct_hist"),"btn-exp":t("btn_exp"),"lbl-imp":t("lbl_imp"),
+    "th-p":t("th_p"),"th-t":t("th_t"),"th-m":t("th_m"),"th-s":t("th_s"),"th-d":t("th_d"),"th-a":t("th_a"),
+    "tbl-empty":t("tbl_empty"),"ct-sb":t("ct_sb"),"lbl-prev":t("lbl_prev"),
+    "sb-all":t("sb_all"),"sb-cp":t("sb_cp"),"sb-sv":t("sb_sv"),"sb-run":t("sb_run"),"sb-clr":t("sb_clr"),
+    "lbl-upl":t("lbl_upl"),"ct-keys":t("ct_keys"),"lbl-gk":t("lbl_gk"),
+    "hint-gk":t("hint_gk"),"lbl-gem":t("lbl_gem"),"hint-gem":t("hint_gem"),
+    "btn-savekeys":t("btn_savekeys"),"ct-app":t("ct_app"),"lbl-dm":t("lbl_dm"),
+    "lbl-lang":t("lbl_lang"),"ct-drv":t("ct_drv"),"txt-drv":t("txt_drv"),
+    "btn-drv-con":t("btn_drv_con"),"btn-drv-sync":t("btn_drv_sync"),
+    "ct-lnks":t("ct_lnks"),"ct-prem":t("ct_prem"),"txt-prem":t("txt_prem"),
+    "btn-prem":t("btn_prem"),"btn-install":t("btn_install")
+  };
+  Object.entries(m).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});
+  const ph={"prompt":t("gen_ph")};
+  Object.entries(ph).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.placeholder=v;});
+  document.querySelectorAll("[data-tab]").forEach(btn=>{
+    const map={gen:"tab_gen",dash:"tab_dash",sb:"tab_sb",cfg:"tab_cfg",doc:"tab_doc"};
+    btn.textContent=t(map[btn.dataset.tab])||btn.textContent;
+  });
+  document.querySelectorAll(".lbtn").forEach(b=>b.classList.toggle("on",b.dataset.lang===lang));
+  document.querySelectorAll("[data-ls]").forEach(b=>b.classList.toggle("on",b.dataset.ls===lang));
+}
+document.querySelectorAll(".lbtn").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.lang;localStorage.setItem("lang",lang);applyLang();renderDash();}));
+document.querySelectorAll("[data-ls]").forEach(b=>b.addEventListener("click",()=>{lang=b.dataset.ls;localStorage.setItem("lang",lang);applyLang();renderDash();}));
+
+// ─── Theme ───────────────────────────────────────────────────────
+const dark0 = localStorage.getItem("dark_mode") !== "false";
+document.body.classList.toggle("dark", dark0);
+const tdark = document.getElementById("tgl-dark");
+tdark.checked = dark0;
+tdark.addEventListener("change", e => {
+  document.body.classList.toggle("dark", e.target.checked);
+  localStorage.setItem("dark_mode", e.target.checked);
+});
+
+// ─── Tabs ────────────────────────────────────────────────────────
+document.querySelectorAll("[data-tab]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("on"));
+    document.querySelectorAll("[data-tab]").forEach(b=>b.classList.remove("on"));
+    const p = document.getElementById("panel-"+btn.dataset.tab);
+    if(p) p.classList.add("on");
+    btn.classList.add("on");
+    if(btn.dataset.tab==="dash") renderDash();
+  });
+});
+
+// ─── Models ──────────────────────────────────────────────────────
+const MODELS = {
+  groq:   { name:"Groq (LLaMA 3 70B)", ep:"https://api.groq.com/openai/v1/chat/completions",      model:"llama3-70b-8192", type:"oai" },
+  gemini: { name:"Gemini Pro",          ep:"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent", model:"gemini-pro", type:"gem" }
+};
+let activeModel = localStorage.getItem("activeModel") || "groq";
+const msel = document.getElementById("msel");
+Object.entries(MODELS).forEach(([id,m])=>{ const o=document.createElement("option"); o.value=id; o.textContent=m.name; msel.appendChild(o); });
+msel.value = activeModel;
+msel.addEventListener("change", e=>{ activeModel=e.target.value; localStorage.setItem("activeModel",activeModel); toast("Modelo: "+MODELS[activeModel].name); });
+
+// ─── Storage ─────────────────────────────────────────────────────
+function getSnips(){ try{ return JSON.parse(localStorage.getItem("codeai_snips")||"[]"); }catch{ return []; } }
+function saveSnip(prompt, completion, meta={}){
+  const snips = getSnips();
+  const s = { id:crypto.randomUUID(), prompt, completion, date:new Date().toISOString(),
+    size:completion.length, version:1, source:meta.source||"AI",
+    type:meta.type||"Code", model:meta.model||activeModel, link:null, tags:[] };
+  snips.unshift(s);
+  localStorage.setItem("codeai_snips", JSON.stringify(snips));
+  tryDriveSync(snips);
+  return s;
+}
+function delSnip(id){ const s=getSnips().filter(x=>x.id!==id); localStorage.setItem("codeai_snips",JSON.stringify(s)); return s; }
+function exportDS(){
+  const ds = getSnips().map(({prompt,completion})=>({prompt,completion}));
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([JSON.stringify(ds,null,2)],{type:"application/json"})); a.download=`codeai-dataset-${Date.now()}.json`; a.click();
+}
+function importDS(file){ return new Promise((res,rej)=>{ const r=new FileReader(); r.onload=e=>{ try{ const d=JSON.parse(e.target.result); let n=0; d.forEach(x=>{ if(x.prompt&&x.completion){saveSnip(x.prompt,x.completion,{source:"Import"});n++;} }); res(n); }catch(err){rej(err);} }; r.readAsText(file); }); }
+
+// Drive
+let driveToken = localStorage.getItem("gd_token") || "";
+function tryDriveSync(s){ if(driveToken) syncDrive(s).catch(()=>{}); }
+async function syncDrive(snips){
+  if(!driveToken) throw new Error("No token");
+  const fn="codeai-hub-snippets.json", content=JSON.stringify(snips,null,2);
+  const sr=await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${fn}'&spaces=drive`,{headers:{Authorization:`Bearer ${driveToken}`}});
+  const sd=await sr.json(); const ef=sd.files?.[0];
+  const meta={name:fn,mimeType:"application/json"};
+  const form=new FormData(); form.append("metadata",new Blob([JSON.stringify(meta)],{type:"application/json"})); form.append("file",new Blob([content],{type:"application/json"}));
+  const url=ef?`https://www.googleapis.com/upload/drive/v3/files/${ef.id}?uploadType=multipart`:"https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
+  const r=await fetch(url,{method:ef?"PATCH":"POST",headers:{Authorization:`Bearer ${driveToken}`},body:form});
+  if(!r.ok) throw new Error("Drive error "+r.status);
+}
+
+// Premium
+async function checkPrem(input){
+  try{
+    // Try direct password first
+    async function sha256(str){
+      const buf=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+    }
+    const CORRECT="61f157e2c1bf0850e9c4e5b631b4653d6f8dde6059755962357f3e847c01f023";
+    let h=await sha256(input);
+    if(h===CORRECT){localStorage.setItem("prem","1");return true;}
+    // Try JSON key
+    try{
+      const j=JSON.parse(input);
+      if(j.key){h=await sha256(j.key);if(h===CORRECT){localStorage.setItem("prem","1");return true;}}
+    }catch{}
+    return false;
+  }catch{return false;}
+}
+function isPrem(){ return localStorage.getItem("prem")==="1"; }
+
+// ─── Code type ───────────────────────────────────────────────────
+function codeType(p){ const l=p.toLowerCase();
+  if(l.includes("pwa")||l.includes("service worker")) return "PWA";
+  if(l.includes("apk")||l.includes("android")) return "APK";
+  if(l.includes("react")||l.includes("component")) return "React";
+  if(l.includes("html")||l.includes("index.html")) return "HTML";
+  if(l.includes("agent")||l.includes("agente")) return "AI Agent";
+  return "Code";
+}
+
+// ─── Generate ────────────────────────────────────────────────────
+const SYS = `You are CodeAI, an expert full-stack developer specialized in PWA, React, HTML/CSS/JS, Android APK (Capacitor), REST APIs, and AI agents. Output clean, production-ready, well-commented code. Use markdown code blocks with language tags.`;
+
+async function callAI(prompt){
+  const m = MODELS[activeModel];
+  const key = localStorage.getItem(activeModel+"_key") || "";
+  if(!key) throw new Error(`API key for ${m.name} not set. Go to ⚙️ Config.`);
+  if(m.type==="oai"){
+    const r=await fetch(m.ep,{method:"POST",headers:{"Authorization":`Bearer ${key}`,"Content-Type":"application/json"},body:JSON.stringify({model:m.model,messages:[{role:"system",content:SYS},{role:"user",content:prompt}],temperature:.3,max_tokens:4096})});
+    const d=await r.json(); if(d.error) throw new Error(d.error.message); return d.choices[0].message.content;
+  } else {
+    const r=await fetch(`${m.ep}?key=${key}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({contents:[{parts:[{text:`${SYS}\n\nRequest: ${prompt}`}]}],generationConfig:{temperature:.3,maxOutputTokens:4096}})});
+    const d=await r.json(); if(d.error) throw new Error(d.error.message); return d.candidates[0].content.parts[0].text;
+  }
+}
+
+function setOut(txt, loading=false){
+  const el=document.getElementById("output"); el.textContent=txt; el.classList.toggle("ld",loading);
+}
+
+document.getElementById("btn-gen").addEventListener("click", async()=>{
+  const p=document.getElementById("prompt").value.trim();
+  if(!p) return toast(t("toast_no_prompt"),"w");
+  setOut("⏳ "+MODELS[activeModel].name+"...", true);
+  try{ const r=await callAI(p); setOut(r); saveSnip(p,r,{model:activeModel,type:codeType(p)}); toast(t("toast_save")); }
+  catch(e){ setOut("❌ "+e.message); toast(e.message,"e"); }
+});
+
+document.getElementById("btn-net").addEventListener("click", async()=>{
+  const q=document.getElementById("prompt").value.trim() || prompt("Buscar en documentación:");
+  if(!q) return;
+  setOut("🔍 Buscando...", true);
+  const res=[]; let out="";
+  try{ const r=await fetch(`https://developer.mozilla.org/api/v1/search?q=${encodeURIComponent(q)}&locale=en-US`); const d=await r.json(); (d.documents||[]).slice(0,3).forEach(x=>res.push(`**[MDN] ${x.title}**\n${x.summary||""}\n🔗 https://developer.mozilla.org${x.mdn_url}`)); }catch{}
+  try{ const r=await fetch(`https://registry.npmjs.org/-/v1/search?text=${encodeURIComponent(q)}&size=3`); const d=await r.json(); (d.objects||[]).forEach(({package:p})=>res.push(`**[npm] ${p.name} v${p.version}**\n${p.description||""}\n🔗 https://npmjs.com/package/${p.name}`)); }catch{}
+  try{ const r=await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(q)}&sort=stars&per_page=3`); const d=await r.json(); (d.items||[]).forEach(x=>res.push(`**[GitHub] ${x.full_name} ⭐${x.stargazers_count}**\n${x.description||""}\n🔗 ${x.html_url}`)); }catch{}
+  setOut(res.length ? res.join("\n\n---\n\n") : "No se encontraron resultados.");
+});
+
+document.getElementById("btn-url").addEventListener("click", async()=>{
+  const url=window.prompt("🌐 URL a consultar:");
+  if(!url) return;
+  setOut("⬇️ Descargando...", true);
+  try{
+    const r=await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+    const d=await r.json(); const txt=(d.contents||"").substring(0,5000);
+    setOut(txt); saveSnip("URL: "+url,txt,{source:"URL",type:"Data"}); toast(t("toast_url_ok"));
+  }catch(e){ setOut("❌ "+e.message); }
+});
+
+document.getElementById("btn-copy-out").addEventListener("click",()=>{ const t2=document.getElementById("output").textContent; navigator.clipboard.writeText(t2); toast(t("toast_copy")); });
+document.getElementById("btn-save-out").addEventListener("click",()=>{ const p2=document.getElementById("prompt").value; const o=document.getElementById("output").textContent; if(p2&&o){saveSnip(p2,o,{model:activeModel,type:codeType(p2)});toast(t("toast_save"));} });
+
+// ─── Quick Prompts ───────────────────────────────────────────────
+const QP = {
+  pwa:"Crea una PWA completa con service worker, manifest.json, soporte offline con IndexedDB y diseño moderno responsive",
+  react:"Genera un componente React funcional con hooks useState y useEffect, props tipadas con PropTypes y estilos CSS Modules",
+  html:"Crea un index.html completo con CSS moderno, animaciones, dark mode toggle y JavaScript vanilla sin dependencias",
+  apk:"Configura Capacitor.js para convertir una PWA en APK Android, incluyendo capacitor.config.ts y AndroidManifest.xml",
+  agent:"Diseña un agente de IA en JavaScript con memoria de conversación, system prompt configurable y llamadas a la API de Groq",
+  api:"Crea un API REST con Express.js, autenticación JWT, rate limiting, SQLite y documentación Swagger"
+};
+function setQP(k){ const el=document.getElementById("prompt"); el.value=QP[k]||k; el.focus(); document.querySelector("[data-tab='gen']")?.click(); }
+
+// ─── Settings ────────────────────────────────────────────────────
+document.getElementById("btn-savekeys").addEventListener("click",()=>{
+  const g=document.getElementById("key-groq").value.trim();
+  const m=document.getElementById("key-gem").value.trim();
+  if(g) localStorage.setItem("groq_key",g);
+  if(m) localStorage.setItem("gemini_key",m);
+  toast(t("toast_keys"));
+});
+["groq","gemini"].forEach(id=>{
+  const k=localStorage.getItem(id+"_key");
+  if(k){ const el=document.getElementById(id==="gemini"?"key-gem":"key-groq"); if(el) el.placeholder="••••••"+k.slice(-4); }
+});
+
+// ── Drive form save ──────────────────────────────────────
+document.getElementById("btn-drv-save").addEventListener("click",()=>{
+  const cid=document.getElementById("drv-client-id").value.trim();
+  const tok=document.getElementById("drv-token").value.trim();
+  if(cid) localStorage.setItem("gd_client_id",cid);
+  if(tok){ driveToken=tok; localStorage.setItem("gd_token",tok); }
+  if(cid||tok){
+    const st=document.getElementById("drv-status");
+    if(st){st.textContent="💾 Guardado";st.style.color="var(--green)";}
+    toast("☁️ Datos de Drive guardados","s");
+  }
+});
+// ── Drive test connection ─────────────────────────────────
+document.getElementById("btn-drv-con").addEventListener("click",async()=>{
+  const tok=document.getElementById("drv-token").value.trim()||driveToken;
+  if(!tok)return toast("Introduce un Access Token primero","w");
+  try{
+    const r=await fetch("https://www.googleapis.com/drive/v3/about?fields=user",{headers:{Authorization:"Bearer "+tok}});
+    const d=await r.json();
+    if(d.user){
+      driveToken=tok; localStorage.setItem("gd_token",tok);
+      const st=document.getElementById("drv-status");
+      if(st){st.textContent="✅ Conectado como "+d.user.displayName;st.style.color="var(--green)";}
+      toast("✅ Drive conectado: "+d.user.displayName,"s");
+    } else throw new Error(d.error?.message||"Token inválido");
+  }catch(e){
+    const st=document.getElementById("drv-status");
+    if(st){st.textContent="❌ "+e.message;st.style.color="var(--red)";}
+    toast("❌ "+e.message,"e");
+  }
+});
+// ── Drive sync snippets ───────────────────────────────────
+document.getElementById("btn-drv-sync").addEventListener("click",async()=>{
+  if(!driveToken)return toast(t("toast_no_drv"),"w");
+  try{await syncDrive(getSnips());toast(t("toast_sync"),"s");}
+  catch(e){toast(e.message,"e");}
+});
+// ── Drive sync training data ──────────────────────────────
+document.getElementById("btn-drv-sync-train").addEventListener("click",async()=>{
+  if(!driveToken)return toast(t("toast_no_drv"),"w");
+  try{
+    const trainData=getTrainingData();
+    await syncDriveFile("codeai-training-data.json",trainData);
+    toast("🧠 Datos de entrenamiento sincronizados","s");
+  }catch(e){toast(e.message,"e");}
+});
+// ── Add link to AI feed ───────────────────────────────────
+document.getElementById("btn-addlnk").addEventListener("click",()=>{
+  // Inline: show a small form underneath the links list
+  const existing=document.getElementById("add-lnk-form");
+  if(existing){existing.remove();return;}
+  const form=document.createElement("div");
+  form.id="add-lnk-form";
+  form.style.cssText="background:var(--bg3);border:1px solid var(--bdr);border-radius:var(--r);padding:12px;margin-top:8px";
+  form.innerHTML=`
+    <div style="margin-bottom:8px">
+      <label style="font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--t2);margin-bottom:4px;display:block">URL</label>
+      <input type="url" id="new-lnk-url" placeholder="https://docs.example.com" style="font-size:12px;background:var(--bgi);border:1px solid var(--bdr);border-radius:var(--r);color:var(--t1);padding:7px 10px;width:100%;outline:none"/>
+    </div>
+    <div style="margin-bottom:10px">
+      <label style="font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--t2);margin-bottom:4px;display:block">Nombre</label>
+      <input type="text" id="new-lnk-name" placeholder="Mi documentación" style="font-size:12px;background:var(--bgi);border:1px solid var(--bdr);border-radius:var(--r);color:var(--t1);padding:7px 10px;width:100%;outline:none"/>
+    </div>
+    <div style="display:flex;gap:7px">
+      <button class="btn bp bsm" onclick="confirmAddLink()">➕ Añadir</button>
+      <button class="btn bg bsm" onclick="document.getElementById('add-lnk-form')?.remove()">✕</button>
+    </div>`;
+  document.getElementById("btn-addlnk").after(form);
+  document.getElementById("new-lnk-url")?.focus();
+});
+window.confirmAddLink=()=>{
+  const u=document.getElementById("new-lnk-url")?.value.trim();
+  const n=document.getElementById("new-lnk-name")?.value.trim()||u?.split("/")[2];
+  if(!u)return toast("Introduce una URL","w");
+  addLink(n||u,u);
+  document.getElementById("add-lnk-form")?.remove();
+  toast(t("toast_lnk"),"s");
+};
+// ── Fetch links into AI context ───────────────────────────
+document.getElementById("btn-fetch-links").addEventListener("click",async()=>{
+  const links=JSON.parse(localStorage.getItem("clinks")||"[]");
+  if(!links.length)return toast("Añade URLs primero","w");
+  toast("🔗 Cargando "+links.length+" URLs en contexto IA...","s");
+  const ctx=links.map(l=>"- "+l.n+": "+l.u).join("\n");
+  localStorage.setItem("ai_url_context",ctx);
+  toast("✅ "+links.length+" URLs disponibles para la IA","s");
+});
+// ── Export profile ────────────────────────────────────────
+document.getElementById("btn-export-profile").addEventListener("click",()=>{
+  const profile={
+    version:"2.0",
+    exported:new Date().toISOString(),
+    snippets:getSnips(),
+    links:JSON.parse(localStorage.getItem("clinks")||"[]"),
+    training:getTrainingData(),
+    settings:{
+      lang:localStorage.getItem("lang")||"es",
+      dark:localStorage.getItem("dark_mode"),
+      activeModel:localStorage.getItem("activeModel")||"groq",
+      viewport:localStorage.getItem("viewport")||"auto"
+    }
+  };
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(profile,null,2)],{type:"application/json"}));
+  a.download="codeai-profile-"+new Date().toISOString().split("T")[0]+".json";
+  a.click();
+  toast("⬇️ Perfil exportado","s");
+});
+// ── Import profile ────────────────────────────────────────
+document.getElementById("inp-import-profile").addEventListener("change",e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const p=JSON.parse(ev.target.result);
+      if(p.snippets){localStorage.setItem("cai_snips",JSON.stringify(p.snippets));}
+      if(p.links){localStorage.setItem("clinks",JSON.stringify(p.links));renderLinks();}
+      if(p.training){localStorage.setItem("cai_training",JSON.stringify(p.training));}
+      if(p.settings){
+        if(p.settings.lang){lang=p.settings.lang;localStorage.setItem("lang",lang);applyLang();}
+        if(p.settings.activeModel)localStorage.setItem("activeModel",p.settings.activeModel);
+        if(p.settings.viewport)setViewport(p.settings.viewport);
+      }
+      renderDash();
+      toast("✅ Perfil importado: "+( p.snippets?.length||0)+" snippets, "+(p.links?.length||0)+" URLs","s");
+    }catch(err){toast("❌ Archivo inválido: "+err.message,"e");}
+  };
+  r.readAsText(file);e.target.value="";
+});
+// ── Training functions ────────────────────────────────────
+function getTrainingData(){
+  const snips=getSnips();
+  const links=JSON.parse(localStorage.getItem("clinks")||"[]");
+  const urlCtx=localStorage.getItem("ai_url_context")||"";
+  return {dataset:snips.map(({prompt,completion})=>({prompt,completion})),links,urlContext:urlCtx,updated:new Date().toISOString()};
+}
+function saveTrainingData(data){
+  localStorage.setItem("cai_training",JSON.stringify({...data,updated:new Date().toISOString()}));
+}
+async function syncDriveFile(filename,data){
+  if(!driveToken)throw new Error("No token Drive");
+  const content=JSON.stringify(data,null,2);
+  const sr=await fetch("https://www.googleapis.com/drive/v3/files?q=name='"+filename+"'&spaces=drive",{headers:{Authorization:"Bearer "+driveToken}});
+  const sd=await sr.json(); const ef=sd.files?.[0];
+  const form=new FormData();
+  form.append("metadata",new Blob([JSON.stringify({name:filename,mimeType:"application/json"})],{type:"application/json"}));
+  form.append("file",new Blob([content],{type:"application/json"}));
+  const url=ef?"https://www.googleapis.com/upload/drive/v3/files/"+ef.id+"?uploadType=multipart":"https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart";
+  const res=await fetch(url,{method:ef?"PATCH":"POST",headers:{Authorization:"Bearer "+driveToken},body:form});
+  if(!res.ok)throw new Error("Drive error "+res.status);
+  return res.json();
+}
+// ── Training AI button ────────────────────────────────────
+document.getElementById("btn-train-ai").addEventListener("click",async()=>{
+  const snips=getSnips();
+  if(!snips.length)return toast("Genera snippets primero para entrenar la IA","w");
+  const prog=document.getElementById("train-progress");
+  const bar=document.getElementById("train-bar");
+  const msg=document.getElementById("train-msg");
+  prog.style.display="block";
+  const steps=[
+    [10,"Recopilando snippets..."],
+    [30,"Procesando dataset..."],
+    [55,"Preparando pares prompt→completion..."],
+    [75,"Guardando en localStorage..."],
+    [90,"Sincronizando con Drive..."],
+    [100,"✅ Entrenamiento completado"]
+  ];
+  for(const [pct,text] of steps){
+    bar.style.width=pct+"%"; msg.textContent=text;
+    await new Promise(r=>setTimeout(r,450));
+  }
+  saveTrainingData(getTrainingData());
+  if(driveToken){try{await syncDriveFile("codeai-training-data.json",getTrainingData());msg.textContent="✅ Guardado y sincronizado con Drive";}catch{msg.textContent="✅ Guardado localmente (Drive no disponible)";}}
+  toast("🧠 Datos de entrenamiento guardados: "+snips.length+" ejemplos","s");
+  setTimeout(()=>{prog.style.display="none";bar.style.width="0%";},3000);
+});
+// ── Connect training API button ───────────────────────────
+// btn-connect-train-api now toggles inline form (onclick on element)
+function toggleTrainApiForm(){
+  const form=document.getElementById("train-api-form");
+  if(!form)return;
+  const isOpen=form.style.display!=="none";
+  form.style.display=isOpen?"none":"block";
+  if(!isOpen){
+    const saved=localStorage.getItem("train_api_url");
+    const inp=document.getElementById("train-api-url-input");
+    if(saved&&inp)inp.value=saved;
+    document.getElementById("train-api-url-input")?.focus();
+  }
+}
+function saveTrainApiConfig(){
+  const url=document.getElementById("train-api-url-input")?.value.trim();
+  const tok=document.getElementById("train-api-token-input")?.value.trim();
+  if(!url)return toast("Introduce la URL del servidor","w");
+  localStorage.setItem("train_api_url",url);
+  if(tok)localStorage.setItem("train_api_token",tok);
+  const st=document.getElementById("train-api-status");
+  if(st){st.textContent="🟢 API: "+url.split("/")[2];st.className="train-status online";}
+  toggleTrainApiForm();
+  toast("🔌 API de entrenamiento configurada: "+url.split("/")[2],"s");
+}
+// Init Drive status from storage
+(()=>{
+  const saved_cid=localStorage.getItem("gd_client_id");
+  const saved_tok=localStorage.getItem("gd_token");
+  if(saved_cid){const el=document.getElementById("drv-client-id");if(el)el.placeholder="••••"+saved_cid.slice(-8);}
+  if(saved_tok){
+    const el=document.getElementById("drv-token");if(el)el.placeholder="ya29.••••••"+saved_tok.slice(-4);
+    const st=document.getElementById("drv-status");if(st){st.textContent="💾 Token guardado";st.style.color="var(--yellow)";}
+  }
+  const trainUrl=localStorage.getItem("train_api_url");
+  if(trainUrl){const st=document.getElementById("train-api-status");if(st){st.textContent="🟢 API: "+trainUrl.split("/")[2];st.className="train-status online";}}
+})();
+
+document.getElementById("btn-prem").addEventListener("click",async()=>{
+  const pwd=document.getElementById("prem-pwd")?.value.trim();
+  const jsonKey=document.getElementById("prem-key")?.value.trim();
+  const input=pwd||jsonKey;
+  if(!input)return toast("⚠️ Introduce la contraseña o clave JSON","w");
+  const ok=await checkPrem(input);
+  if(ok){unlockPrem();const s=document.getElementById("prem-status");if(s)s.style.display="block";toast(t("toast_prem_ok"),"s");}
+  else toast(t("toast_prem_no"),"e");
+});
+// Premium — import JSON file
+document.getElementById("prem-file-input").addEventListener("change",async(e)=>{
+  const file=e.target.files?.[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async(ev)=>{
+    const content=ev.target.result.trim();
+    document.getElementById("prem-key").value=content;
+    const ok=await checkPrem(content);
+    if(ok){unlockPrem();toast(t("toast_prem_ok"),"s");}
+    else toast("📂 Archivo cargado — pulsa Activar para verificar","w");
+  };
+  reader.readAsText(file);
+  e.target.value="";
+});
+
+function addLink(n,u){ const l=JSON.parse(localStorage.getItem("clinks")||"[]"); l.push({n,u}); localStorage.setItem("clinks",JSON.stringify(l)); renderLinks(); }
+function renderLinks(){ const c=document.getElementById("lnk-list"); if(!c)return; const l=JSON.parse(localStorage.getItem("clinks")||"[]"); c.innerHTML=l.map((x,i)=>`<div class="lc"><a href="${x.u}" target="_blank">${x.n}</a><button onclick="removeLink(${i})">✕</button></div>`).join("")||`<p style="font-size:13px;color:var(--t3)">Sin enlaces.</p>`; }
+window.removeLink=i=>{ const l=JSON.parse(localStorage.getItem("clinks")||"[]"); l.splice(i,1); localStorage.setItem("clinks",JSON.stringify(l)); renderLinks(); };
+function unlockPrem(){
+  document.querySelectorAll(".locked").forEach(el=>el.classList.remove("locked"));
+  const ps=document.getElementById("prem-status"); if(ps) ps.style.display="block";
+}
+if(isPrem()){unlockPrem();const ps=document.getElementById("prem-status");if(ps)ps.style.display="block";}
+renderLinks();
+
+// ─── Sandbox ─────────────────────────────────────────────────────
+const sbed=document.getElementById("sb-ed"), sbpre=document.getElementById("sb-pre");
+document.getElementById("sb-all").addEventListener("click",()=>sbed.select());
+document.getElementById("sb-cp").addEventListener("click",()=>{navigator.clipboard.writeText(sbed.value);toast(t("toast_copy"));});
+document.getElementById("sb-sv").addEventListener("click",()=>{ if(sbed.value.trim()){saveSnip("Sandbox manual",sbed.value,{source:"Sandbox",type:"Manual"});toast(t("toast_save"));}});
+document.getElementById("sb-run").addEventListener("click",()=>{
+  if(!sbed.value.trim())return;
+  sbpre.srcdoc=sbed.value;
+});
+document.getElementById("sb-clr").addEventListener("click",()=>{ if(confirm("¿Limpiar?")){ sbed.value=""; sbpre.srcdoc="<html><body style='display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif;color:#999;font-size:12px;background:#f8f8f8'>Editor limpiado</body></html>"; document.getElementById("sb-fi").style.display="none"; } });
+document.getElementById("sb-file").addEventListener("change",e=>{
+  const f=e.target.files?.[0]; if(!f)return;
+  const r=new FileReader(); r.onload=ev=>{ sbed.value=ev.target.result; const fi=document.getElementById("sb-fi"); document.getElementById("sb-fn").textContent=f.name; document.getElementById("sb-fs").textContent=f.size>1024?(f.size/1024).toFixed(1)+" KB":f.size+" B"; fi.style.display="flex"; toast("📂 "+f.name+" cargado"); }; r.readAsText(f); e.target.value="";
+});
+
+// ─── Dashboard ───────────────────────────────────────────────────
+let charts={};
+function renderDash(){
+  const snips=getSnips();
+  const tot=snips.length, sz=(snips.reduce((a,s)=>a+s.size,0)/1024).toFixed(1), mods=[...new Set(snips.map(s=>s.model))];
+  const hoy=snips.filter(s=>new Date(s.date).toDateString()===new Date().toDateString()).length;
+  document.getElementById("st-tot").textContent=tot;
+  document.getElementById("st-sz").textContent=sz+" KB";
+  document.getElementById("st-hoy").textContent=hoy;
+  document.getElementById("st-mod").textContent=mods.join(", ")||"—";
+  renderTbl(snips);
+  renderCharts(snips);
+  if(isPrem()) renderPred(snips);
+}
+function renderTbl(snips){
+  const tb=document.getElementById("tbl-body"); if(!tb)return;
+  if(!snips.length){ tb.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:36px">${t("tbl_empty")}</td></tr>`; return; }
+  tb.innerHTML=snips.slice(0,20).map(s=>`<tr data-id="${s.id}">
+    <td class="tdp">${s.prompt.substring(0,50)}${s.prompt.length>50?"…":""}</td>
+    <td><span class="tag">${s.type}</span></td>
+    <td style="font-size:11px;color:var(--t3)">${s.model}</td>
+    <td style="font-size:11px;color:var(--t3)">${(s.size/1024).toFixed(2)} KB</td>
+    <td style="font-size:11px;color:var(--t3)">${new Date(s.date).toLocaleDateString()}</td>
+    <td class="tda">
+      <button class="bic" onclick="cpSnip('${s.id}')" title="Copiar">📋</button>
+      <button class="bic" onclick="edSnip('${s.id}')" title="Editar">✏️</button>
+      <button class="bic bd" onclick="dlSnip('${s.id}')" title="Eliminar">🗑️</button>
+    </td></tr>`).join("");
+}
+function renderCharts(snips){
+  if(typeof Chart==="undefined") return;
+  Object.values(charts).forEach(c=>c.destroy()); charts={};
+  const recent=snips.slice(0,15).reverse();
+  const labels=recent.map(s=>new Date(s.date).toLocaleDateString());
+  const sizes=recent.map(s=>s.size);
+  const co={plugins:{legend:{labels:{color:"#e0f4ff"}}},scales:{x:{ticks:{color:"#8ab4cc"},grid:{color:"rgba(255,255,255,.05)"}},y:{ticks:{color:"#8ab4cc"},grid:{color:"rgba(255,255,255,.05)"}}}};
+  const bc=document.getElementById("chart-bar")?.getContext("2d");
+  if(bc) charts.bar=new Chart(bc,{type:"bar",data:{labels,datasets:[{label:"Tamaño",data:sizes,backgroundColor:"rgba(0,200,255,.6)",borderColor:"rgba(0,200,255,1)",borderWidth:2,borderRadius:5}]},options:co});
+  const types=snips.reduce((a,s)=>{a[s.type]=(a[s.type]||0)+1;return a},{});
+  const pc=document.getElementById("chart-pie")?.getContext("2d");
+  if(pc) charts.pie=new Chart(pc,{type:"doughnut",data:{labels:Object.keys(types),datasets:[{data:Object.values(types),backgroundColor:["#00c8ff","#ff3e6c","#ffe100","#00ff99","#c87aff","#ff8c00"],borderWidth:0}]},options:{plugins:{legend:{labels:{color:"#e0f4ff"}}}}});
+  const lc=document.getElementById("chart-line")?.getContext("2d");
+  if(lc) charts.line=new Chart(lc,{type:"line",data:{labels,datasets:[{label:"Acumulado",data:recent.map((_,i)=>i+1),borderColor:"#ffe100",backgroundColor:"rgba(255,225,0,.1)",tension:.4,fill:true,pointBackgroundColor:"#ffe100"}]},options:co});
+}
+function renderPred(snips){
+  const c=document.getElementById("pred-sec"); if(!c)return; c.style.display="block";
+  const l7=snips.filter(s=>(Date.now()-new Date(s.date).getTime())<7*864e5);
+  c.innerHTML=`<div class="pred-c"><h4>🔮 Predicción (Premium)</h4><p>Promedio diario (7d): <strong>${(l7.length/7).toFixed(1)}</strong></p><p>Proyección 30 días: <strong>${Math.round(l7.length/7*30)} snippets</strong></p><p>Tendencia: <strong>${l7.length>snips.length/14?"📈 Creciente":"📉 Estable"}</strong></p></div>`;
+}
+document.getElementById("btn-exp").addEventListener("click",exportDS);
+document.getElementById("inp-imp").addEventListener("change",async e=>{ const n=await importDS(e.target.files[0]); renderDash(); toast(`✅ Importados ${n} snippets`); });
+
+window.cpSnip=id=>{ const s=getSnips().find(x=>x.id===id); if(s){navigator.clipboard.writeText(s.completion);toast(t("toast_copy"));} };
+window.edSnip=id=>{ const s=getSnips().find(x=>x.id===id); if(s){document.getElementById("sb-ed").value=s.completion;document.querySelector("[data-tab='sb']")?.click();} };
+window.dlSnip=id=>{ if(confirm("¿Eliminar?")){delSnip(id);renderDash();toast(t("toast_del"));} };
+
+// ─── Pomodoro ────────────────────────────────────────────────────
+let pomT=25*60, pomR=false, pomI=null;
+function updPom(){ const m=String(Math.floor(pomT/60)).padStart(2,"0"),s=String(pomT%60).padStart(2,"0"); document.getElementById("pom-d").textContent=`${m}:${s}`; }
+document.getElementById("btn-pom").addEventListener("click",()=>{
+  const btn=document.getElementById("btn-pom");
+  if(pomR){clearInterval(pomI);pomR=false;btn.textContent="▶";}
+  else{pomR=true;btn.textContent="⏸";pomI=setInterval(()=>{pomT--;updPom();if(pomT<=0){clearInterval(pomI);pomR=false;pomT=25*60;btn.textContent="▶";updPom();toast(t("toast_pom"));}},1000);}
+});
+document.getElementById("btn-pom-r").addEventListener("click",()=>{clearInterval(pomI);pomR=false;pomT=25*60;document.getElementById("btn-pom").textContent="▶";updPom();});
+updPom();
+
+// ─── PWA Install ─────────────────────────────────────────────────
+let dip=null;
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); dip=e; const b=document.getElementById("btn-install"); b.style.display="inline-flex"; b.classList.add("ip"); });
+document.getElementById("btn-install").addEventListener("click",async()=>{ if(!dip)return; dip.prompt(); const{outcome}=await dip.userChoice; if(outcome==="accepted"){document.getElementById("btn-install").style.display="none";} dip=null; });
+window.addEventListener("appinstalled",()=>document.getElementById("btn-install").style.display="none");
+// iOS hint
+if(/iphone|ipad|ipod/i.test(navigator.userAgent)&&!window.matchMedia("(display-mode:standalone)").matches){
+  const b=document.getElementById("btn-install"); b.style.display="inline-flex";
+  b.addEventListener("click",()=>toast("iOS: Toca 📤 compartir → 'Añadir a pantalla de inicio'","w"),{once:true});
+}
+
+// ─── Service Worker ──────────────────────────────────────────────
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js").catch(()=>{});
+}
+
+// ─── Toast ───────────────────────────────────────────────────────
+function toast(msg,type="i"){
+  const tc=document.getElementById("tc"); const d=document.createElement("div");
+  d.className="toast"+(type==="e"?" te":type==="w"?" tw2":""); d.textContent=msg;
+  tc.appendChild(d); setTimeout(()=>d.remove(),3500);
+}
+
+// ─── Init ────────────────────────────────────────────────────────
+// ── Viewport toggle ───────────────────────────────────────
+function setViewport(mode,btn){
+  const vw=document.querySelector('meta[name="viewport"]');
+  const modes={
+    auto:'width=device-width,initial-scale=1,viewport-fit=cover',
+    desktop:'width=1280',
+    tablet:'width=768',
+    mobile:'width=390,initial-scale=1'
+  };
+  if(vw) vw.content=modes[mode]||modes.auto;
+  document.querySelectorAll('.vp-btn').forEach(b=>b.classList.remove('vp-on'));
+  if(btn) btn.classList.add('vp-on');
+  else document.querySelector('[data-vp="'+mode+'"]')?.classList.add('vp-on');
+  localStorage.setItem('viewport',mode);
+  toast('📐 Vista: '+mode,'s');
+}
+// Init viewport from saved setting
+(()=>{const v=localStorage.getItem('viewport')||'auto';setViewport(v);})();
+
+// ── Manual popup modal ────────────────────────────────────
+function openManualModal(){
+  const modal=document.getElementById('manualModal');
+  const body=document.getElementById('manualModalBody');
+  if(!modal||!body)return;
+  // Clone manual content into modal
+  const src=document.getElementById('manualContent');
+  if(src) body.innerHTML='<div style="margin-bottom:14px">'+src.innerHTML+'</div>';
+  // Also add policies
+  const pol=document.getElementById('polContent');
+  if(pol) body.innerHTML+='<div style="margin-top:4px">'+pol.innerHTML+'</div>';
+  modal.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeManualModal(){
+  const modal=document.getElementById('manualModal');
+  if(modal)modal.classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeManualModal();});
+
+
+// ── Bonus 1: Live search in history table ─────────────────
+function filterTable(query){
+  const rows=document.querySelectorAll('#tbl-body tr');
+  const q=query.toLowerCase();
+  rows.forEach(row=>{
+    const txt=row.textContent.toLowerCase();
+    row.style.display=(q===''||txt.includes(q))?'':'none';
+  });
+}
+// ── Bonus 2: Live snippet counter in header ───────────────
+function updateHeaderCount(){
+  const el=document.getElementById('hdr-count');
+  if(el)el.textContent=getSnips().length+' snips';
+}
+// ── Bonus 3: Keyboard shortcut Ctrl+Enter to generate ─────
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){
+    e.preventDefault();
+    document.getElementById('btn-gen')?.click();
+  }
+});
+// ── Bonus 4: Auto-save draft prompt ──────────────────────
+const promptEl=document.getElementById('prompt');
+if(promptEl){
+  const saved=localStorage.getItem('draft_prompt');
+  if(saved)promptEl.value=saved;
+  promptEl.addEventListener('input',()=>localStorage.setItem('draft_prompt',promptEl.value));
+}
+
+// ─── Manual accordion data ────────────────────────────────────────
+const MANUAL_SECTIONS = [
+  {t:"🚀 Inicio Rápido — 5 minutos",b:`<h4>1. Obtener API Key gratuita</h4><ul><li><strong>Groq (recomendado):</strong> <a href="https://console.groq.com" target="_blank">console.groq.com</a> → crear cuenta → API Keys → Create</li><li><strong>Gemini:</strong> <a href="https://aistudio.google.com" target="_blank">aistudio.google.com</a> → Get API Key</li></ul><h4>2. Configurar</h4><p>⚙️ Config → Claves API → pega la key → 💾 Guardar. Las claves se guardan solo en tu navegador.</p><h4>3. Generar código</h4><p>⚡ Generador → escribe prompt → 🤖 Generar con IA → resultado aparece a la derecha y se guarda.</p><h4>4. Instalar como app</h4><p>Sirve desde HTTPS → aparece 📲 Instalar en el header. iOS: toca 📤 → "Añadir a inicio".</p>`},
+  {t:"⚡ Generador de Código",b:`<h4>Botón 🤖 Generar con IA</h4><p>Envía el prompt al modelo activo con system prompt especializado. Soporta PWA, React, HTML, APK, APIs, IA Agents.</p><h4>Botón 🌐 Obtener datos de Internet</h4><p>Busca en MDN, GitHub y npm simultáneamente. Configura número de resultados en ⚙️ Config.</p><h4>Botón 🔗 URL</h4><p>Extrae el contenido de cualquier URL pública y lo guarda como snippet.</p><h4>Herramientas de código</h4><ul><li><kbd>🔍 Explicar</kbd> — Analiza y explica el código en español</li><li><kbd>🐛 Corregir</kbd> — Detecta y corrige bugs automáticamente</li><li><kbd>⚡ Optimizar</kbd> — Mejora rendimiento y buenas prácticas</li></ul><h4>Acciones del resultado</h4><ul><li>📋 Copiar al portapapeles</li><li>💾 Guardar snippet</li><li>🧪 Enviar al Sandbox</li><li>⬇️ Descargar como .txt</li></ul><h4>Prompts Rápidos</h4><p>8 plantillas optimizadas: PWA, React, HTML, APK, IA Agent, API REST, CSS Animaciones, Node.js.</p>`},
+  {t:"📊 Dashboard — Gráficos y Estadísticas",b:`<h4>Estadísticas en tiempo real</h4><p>4 contadores: total snippets, KB guardados, generaciones hoy, modelo activo.</p><h4>🧠 Entrenar IA</h4><p>El botón grande verde entrena la IA con tus snippets. Los datos se guardan en localStorage y se sincronizan con Drive. Usa "Conectar API de entrenamiento" para conectar un servidor propio.</p><h4>Datos en tiempo real</h4><ul><li><strong>npm:</strong> descargas semanales de React, Vue, Svelte, Next, Angular</li><li><strong>GitHub Trending:</strong> repos más populares</li><li><strong>TIOBE:</strong> popularidad de lenguajes 2024</li></ul><h4>Mis estadísticas</h4><p>3 gráficos de tus snippets: barras (tamaño), donut (tipos), línea (crecimiento).</p><h4>Historial</h4><p>Tabla con todos los snippets. Acciones: 📋 copiar, ✏️ editar en sandbox, 🗑️ eliminar. Exporta/importa en JSON.</p>`},
+  {t:"🧪 Sandbox Editor",b:`<h4>Editor de código</h4><p>Editor con soporte HTML, JS, CSS, JSON, Python y más archivos de texto.</p><h4>▶ Ejecutar</h4><p>Renderiza el HTML en el iframe de preview usando <code>srcdoc</code> — funciona sin servidor, incluso abriendo el archivo directamente.</p><h4>📂 Subir archivo</h4><p>Acepta: .html .js .css .json .md .jsx .ts .tsx .py .php .svg .vue</p><h4>Generar con IA en sandbox</h4><p>El campo inferior genera HTML directamente y lo renderiza automáticamente en el preview.</p><h4>Acciones</h4><ul><li>☰ Seleccionar todo el código</li><li>📋 Copiar al portapapeles</li><li>💾 Guardar como snippet</li><li>🗑️ Limpiar editor y preview</li></ul>`},
+  {t:"⚙️ Configuración — Todas las opciones",b:`<h4>Claves API</h4><p>Groq (LLaMA 3 70B) y Gemini Pro. Se guardan en <code>localStorage</code>, nunca salen del dispositivo. Masked con ●●●● al guardar.</p><h4>Apariencia</h4><p>Toggle oscuro/claro. Idioma (ES/EN/ZH). Modo de vista: Auto / Escritorio / Tablet / Móvil.</p><h4>☁️ Google Drive Real</h4><p>Introduce tu Client ID y Access Token OAuth2. Botones: Guardar, Probar conexión, Sincronizar snippets, Sync datos IA.</p><p>Token OAuth2: <a href="https://developers.google.com/oauthplayground" target="_blank">OAuth Playground</a> → scope <code>drive.file</code>.</p><h4>URLs para alimentar la IA</h4><p>Añade URLs de documentación. El botón "Cargar en IA" pone todas las URLs como contexto activo para la próxima generación.</p><h4>Exportar / Importar Perfil</h4><p>Exporta toda la configuración (snippets, URLs, entrenamiento, ajustes) en un JSON. Importa en cualquier dispositivo para restaurar todo.</p><h4>Premium SHA-256</h4><p>Contraseña verificada localmente. Acepta texto directo o archivo JSON con <code>{"key":"CONTRASEÑA"}</code>.</p>`},
+  {t:"🧠 Sistema de Entrenamiento IA",b:`<h4>¿Qué hace?</h4><p>Guarda tus pares prompt→completion en un dataset de entrenamiento local. Sirve para fine-tuning de modelos propios o para mantener contexto consistente.</p><h4>Cómo entrenar</h4><ol><li>Genera código con la IA (los snippets se guardan automáticamente)</li><li>Ve a 📊 Dashboard → pulsa el botón grande 🧠 Entrenar IA</li><li>El sistema procesa todos tus snippets y los guarda como dataset</li><li>Se sincroniza con Drive automáticamente si está conectado</li></ol><h4>API de entrenamiento externa</h4><p>Usa "🔌 Conectar API" para conectar un servidor propio de entrenamiento (LLaMA, OpenLLM, Ollama, etc.)</p><h4>Datos guardados</h4><ul><li>Dataset: pares prompt/completion de todos tus snippets</li><li>Links: URLs de documentación añadidas en Config</li><li>Contexto URL: URLs activas como contexto de la IA</li></ul>`},
+  {t:"☁️ Google Drive — Configuración detallada",b:`<h4>Paso 1: Crear proyecto en Google Cloud</h4><ol><li>Ve a <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a></li><li>Crea un proyecto nuevo</li><li>Activa "Google Drive API" en la biblioteca</li><li>Credenciales → Crear → OAuth 2.0 Client ID → Web Application</li><li>Añade tu dominio en "Orígenes JavaScript autorizados"</li></ol><h4>Paso 2: Obtener Access Token</h4><p>Método fácil: <a href="https://developers.google.com/oauthplayground" target="_blank">OAuth Playground</a></p><ol><li>Selecciona scope: <code>https://www.googleapis.com/auth/drive.file</code></li><li>Autoriza con tu cuenta Google</li><li>Copia el Access Token (válido ~1 hora)</li></ol><h4>Paso 3: Configurar en la app</h4><p>⚙️ Config → Google Drive → pega Client ID y Token → 💾 Guardar → 🔗 Probar conexión.</p><h4>Archivos creados en Drive</h4><ul><li><code>codeai-hub-snippets.json</code> — tus snippets</li><li><code>codeai-training-data.json</code> — datos de entrenamiento</li></ul>`},
+  {t:"📐 Modo de Vista — Escritorio/Tablet/Móvil",b:`<h4>¿Para qué sirve?</h4><p>Simula diferentes tamaños de pantalla dentro del navegador para probar cómo se ve la app en distintos dispositivos.</p><h4>Modos disponibles</h4><ul><li><strong>🖥️ Auto:</strong> respeta el viewport del navegador (recomendado)</li><li><strong>💻 Escritorio:</strong> fuerza width=1280px</li><li><strong>📱 Tablet:</strong> fuerza width=768px</li><li><strong>📲 Móvil:</strong> fuerza width=390px</li></ul><h4>Dónde configurar</h4><p>⚙️ Config → Apariencia → 📐 Vista de pantalla. Se guarda en localStorage y persiste entre sesiones.</p>`},
+  {t:"📤 Exportar / Importar Perfil completo",b:`<h4>¿Qué incluye el perfil?</h4><ul><li>Todos tus snippets (prompt + código generado)</li><li>URLs de documentación añadidas</li><li>Datos de entrenamiento IA</li><li>Ajustes: idioma, modelo activo, modo vista</li></ul><h4>Exportar</h4><p>⚙️ Config → Exportar / Importar Perfil → ⬇️ Exportar. Descarga <code>codeai-profile-FECHA.json</code></p><h4>Importar en otro dispositivo</h4><p>Abre la app en el nuevo dispositivo → ⚙️ Config → ⬆️ Importar perfil → selecciona el JSON. Restaura todo automáticamente.</p><h4>Uso recomendado</h4><p>Exporta periódicamente como backup. Si cambias de dispositivo o reinstalaS el navegador, importa tu perfil para recuperarlo todo.</p>`},
+  {t:"🔒 Seguridad y Privacidad",b:`<h4>Principios</h4><ul><li>API keys: solo en <code>localStorage</code> del navegador, nunca en servidor propio</li><li>Snippets: solo en tu dispositivo</li><li>Los prompts van directamente a Groq/Gemini con tu key — sin intermediario</li><li>Sin analytics, tracking ni publicidad</li></ul><h4>Premium sin servidor</h4><p>La contraseña se verifica con SHA-256 via Web Crypto API. No requiere internet. El hash nunca se envía a ningún servidor.</p><h4>Filtro de seguridad</h4><p>Bloquea prompts con términos de malware, exploits, violencia y similares. Activable/desactivable en Config.</p><h4>Borrar todos los datos</h4><p>Consola del navegador: <code>localStorage.clear()</code> → recarga la página.</p>`},
+  {t:"🍅 Pomodoro — Técnica de productividad",b:`<h4>¿Qué es?</h4><p>Ciclos de trabajo concentrado (25 min) seguidos de descanso (5 min). Mejora la productividad y previene fatiga.</p><h4>Uso</h4><ul><li>▶ Iniciar: comienza el temporizador en el header</li><li>⏸ Pausar: pausa sin resetear</li><li>↺ Resetear: vuelve al tiempo configurado</li></ul><p>Al completar el ciclo: toast de aviso + sonido (si está activado).</p><h4>Configurar tiempo</h4><p>⚙️ Config → campo "Tiempo Pomodoro": 15, 25, 30 o 45 minutos.</p>`},
+  {t:"📖 Manual popup — Cómo usar esta ventana",b:`<h4>Esta ventana</h4><p>Abre el manual completo como popup sobre la app. Puedes navegar el contenido sin perder tu trabajo en el generador.</p><h4>Cómo cerrar</h4><ul><li>✕ — botón en la esquina superior derecha</li><li>Tecla <kbd>Escape</kbd></li><li>Clic en el fondo oscuro fuera del panel</li></ul><h4>Acordeón en pestaña Docs</h4><p>Cada sección del manual es expandible. Usa "Expandir todo / Colapsar todo" para ver/ocultar todo de una vez.</p>`}
+]
+
+function renderManual(){
+  const c=document.getElementById("manualContent");
+  if(!c)return;
+  c.innerHTML=MANUAL_SECTIONS.map(s=>
+    '<div class="ms"><div class="mh" onclick="togM(this)"><span>'+s.t+'</span><span class="arr">&#9654;</span></div><div class="mb">'+s.b+'</div></div>'
+  ).join("");
+}
+function togM(h){h.classList.toggle("op");h.nextElementSibling.classList.toggle("op");}
+function expandAll(){document.querySelectorAll(".mh").forEach(h=>{h.classList.add("op");h.nextElementSibling.classList.add("op");});}
+function collapseAll(){document.querySelectorAll(".mh").forEach(h=>{h.classList.remove("op");h.nextElementSibling.classList.remove("op");});}
+
+// ─── Policies ─────────────────────────────────────────────────────
+function renderPolicies(){
+  const c=document.getElementById("polContent");
+  if(!c)return;
+  c.innerHTML=`
+  <div class="pc">
+    <h3>📋 Términos de Servicio — CodeAI Hub Online v2</h3>
+    <p><strong>Desarrollador:</strong> ANDRESXPOP1985 &nbsp;|&nbsp; <strong>Versión:</strong> 2.0 &nbsp;|&nbsp; <strong>Abril 2026</strong></p>
+    <div class="hl">Herramienta de productividad para desarrolladores. El uso implica aceptación de estos términos.</div>
+    <h4>1. Uso Aceptable</h4>
+    <ul>
+      <li>Permitido: generar, explorar y almacenar código de programación legítimo</li>
+      <li>Prohibido: código malicioso, malware, exploits o contenido ilegal</li>
+      <li>El usuario es el único responsable del código generado y su uso</li>
+    </ul>
+    <h4>2. Privacidad de Datos</h4>
+    <ul>
+      <li>API keys: almacenadas <strong>solo en localStorage</strong> del navegador del usuario</li>
+      <li>Snippets: guardados <strong>solo en el dispositivo local</strong></li>
+      <li>No recopilamos, almacenamos ni vendemos datos personales</li>
+      <li>Los prompts van directamente a Groq/Google según la key del usuario</li>
+    </ul>
+    <h4>3. Limitación de Responsabilidad</h4>
+    <p>Se provee "tal cual" sin garantías. Revisa y prueba el código generado antes de usarlo en producción.</p>
+    <h4>4. Propiedad Intelectual</h4>
+    <p>El código generado por IA es propiedad del usuario. La app está bajo licencia MIT para uso personal. Uso comercial requiere licencia B2B.</p>
+  </div>
+  <div class="pc">
+    <h3>💰 Modelo de Monetización</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px">
+      <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:12px">
+        <h4 style="color:var(--blue)">🆓 Plan Gratuito</h4>
+        <ul><li>Generación ilimitada (API key propia)</li><li>Snippets locales</li><li>Dashboard + 3 gráficos</li><li>Sandbox con preview</li><li>3 idiomas</li></ul>
+      </div>
+      <div style="background:var(--bg2);border:1px solid rgba(255,215,0,.3);border-radius:var(--r);padding:12px">
+        <h4 style="color:var(--yellow)">⭐ Premium ($4.99/mes)</h4>
+        <ul><li>Auto-sync Google Drive</li><li>Gráficos generados por IA</li><li>Predicciones dashboard</li><li>Dataset con metadatos</li><li>Soporte por email</li></ul>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--bdr);border-radius:var(--r);padding:12px">
+        <h4 style="color:var(--blue)">🏢 B2B ($29/user/mes)</h4>
+        <ul><li>Todo Premium</li><li>Dashboard de equipo</li><li>Webhooks (Slack, Jira)</li><li>SLA 99.9%</li><li>Onboarding personalizado</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="pc">
+    <h3>🏪 Google Play — Política de Privacidad</h3>
+    <div class="hl">Necesitas una URL pública de Política de Privacidad antes de publicar en Play Store.</div>
+    <h4>Resumen (para Play Store)</h4>
+    <ul>
+      <li>Datos almacenados únicamente en el dispositivo del usuario</li>
+      <li>API keys usadas solo para llamadas directas a servicios de IA</li>
+      <li>No compartimos datos con terceros excepto los servicios elegidos por el usuario</li>
+      <li>Eliminar datos: <code>localStorage.clear()</code> en la consola del navegador</li>
+      <li>Sin publicidad de terceros. Sin tracking.</li>
+    </ul>
+    <h4>Derechos GDPR / CCPA</h4>
+    <ul>
+      <li class="rok">✅ Acceso: DevTools → Application → Local Storage</li>
+      <li class="rok">✅ Supresión: <code>localStorage.clear()</code></li>
+      <li class="rok">✅ Portabilidad: Dashboard → Exportar JSON</li>
+    </ul>
+  </div>`;
+}
+
+
+// ── Hamburger menu toggle ─────────────────────────────────
+function toggleNav(){
+  const nav=document.getElementById('main-nav');
+  const btn=document.getElementById('ham-btn');
+  if(!nav||!btn)return;
+  const isOpen=nav.classList.toggle('nav-open');
+  btn.classList.toggle('open',isOpen);
+}
+// Close nav when a tab is clicked on mobile
+document.addEventListener('click',function(e){
+  if(e.target.classList.contains('tab')){
+    const nav=document.getElementById('main-nav');
+    const btn=document.getElementById('ham-btn');
+    if(nav)nav.classList.remove('nav-open');
+    if(btn)btn.classList.remove('open');
+  }
+});
+
+applyLang();
+renderLinks();
+renderManual();
+renderPolicies();
+renderDash();
+setTimeout(()=>toast(t("toast_ready")),300);
+
+
+
+// Load Chart.js dynamically
+const cjs=document.createElement("script");
+cjs.src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js";
+cjs.onload=()=>renderDash();
+document.head.appendChild(cjs);
+</script>
+
+<!-- Inline SW registration as fallback -->
+<script>
+// Inline manifest data for environments that can't serve JSON
+if(!document.querySelector('link[rel="manifest"]')){
+  const ml=document.createElement("link"); ml.rel="manifest"; ml.href="manifest.json"; document.head.appendChild(ml);
+}
+</script>
+</body>
+</html>
